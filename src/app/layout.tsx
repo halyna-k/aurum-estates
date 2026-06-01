@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "./globals.css";
 
+import { AiAssistant, Footer, Header } from "../components";
+
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-serif",
@@ -22,20 +24,23 @@ export const metadata: Metadata = {
     template: "%s | Aurum Estates",
   },
   description: "Premium real estate platform with AI assistant",
-  metadataBase: new URL("https://aurum-estates.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
+  ),
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${cormorant.variable} ${montserrat.variable} antialiased font-sans bg-white text-neutral-900`}
-      >
-        <main className="min-h-screen">{children}</main>
+    <html lang="en" suppressHydrationWarning data-theme="dark">
+      <body className={`${cormorant.variable} ${montserrat.variable} antialiased`}>
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1 relative z-0">
+            {children}
+          </main>
+          <Footer />
+          <AiAssistant />
+        </div>
       </body>
     </html>
   );
