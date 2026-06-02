@@ -1,0 +1,97 @@
+/* Base reveal system */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+
+  will-change: opacity, transform;
+
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Fade */
+.reveal-fade {
+  opacity: 0;
+  will-change: opacity;
+
+  transition: opacity var(--transition-slow);
+}
+
+.reveal-fade.in-view {
+  opacity: 1;
+}
+
+/* Slide Left */
+.reveal-left {
+  opacity: 0;
+  transform: translate3d(-24px, 0, 0);
+
+  will-change: opacity, transform;
+
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+.reveal-left.in-view {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Slide Right */
+.reveal-right {
+  opacity: 0;
+  transform: translate3d(24px, 0, 0);
+
+  will-change: opacity, transform;
+
+  transition:
+    opacity var(--transition-slow),
+    transform var(--transition-slow);
+}
+
+.reveal-right.in-view {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Stagger */
+.stagger-1 { transition-delay: 0.05s; }
+.stagger-2 { transition-delay: 0.1s; }
+.stagger-3 { transition-delay: 0.15s; }
+.stagger-4 { transition-delay: 0.2s; }
+.stagger-5 { transition-delay: 0.25s; }
+
+/* Performance Optimization */
+.reveal,
+.reveal-fade,
+.reveal-left,
+.reveal-right {
+  backface-visibility: hidden;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-fade,
+  .reveal-left,
+  .reveal-right {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .stagger-1,
+  .stagger-2,
+  .stagger-3,
+  .stagger-4,
+  .stagger-5 {
+    transition-delay: 0s !important;
+  }
+}

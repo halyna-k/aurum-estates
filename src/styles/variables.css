@@ -1,0 +1,88 @@
+:root {
+  /* Brand */
+  --gold: #C9A84C;
+  --gold-light: #E8C97A;
+
+  /* Background */
+  --bg: #0A0A0A;
+  --bg-2: #111111;
+  --bg-3: #1A1A1A;
+  --bg-4: #242424;
+  --bg-5: #2E2E2E;
+
+  /* Text */
+  --text-primary: #F5F1E6;
+  --text-secondary: #C9BEA6;
+  --text-muted: #9B8F75;
+
+  /* Borders */
+  --border: rgba(201, 168, 76, 0.28);
+  --border-hover: rgba(201, 168, 76, 0.55);
+
+  /* Shadows */
+  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow: 0 12px 48px rgba(0, 0, 0, 0.65);
+  --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.75);
+
+  /* Motion */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.35s ease;
+  --transition-slow: 0.6s ease;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Layout */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Z-Index */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal: 50;
+  --z-toast: 70;
+  --z-overlay: 90;
+  --z-max: 100;
+
+  /* State Colors */
+  --success: #4CAF50;
+  --warning: #E8A84C;
+  --error: #E25555;
+  --info: #4CA3FF;
+}
+
+/* Light mode from system only */
+@media (prefers-color-scheme: light) {
+  :root {
+    --gold: #9A6E1A;
+    --gold-light: #C9A84C;
+
+    --bg: #FAF8F4;
+    --bg-2: #F2EDE3;
+    --bg-3: #EBE4D6;
+    --bg-4: #E3DACE;
+    --bg-5: #D9CEB8;
+
+    --text-primary: #18130A;
+    --text-secondary: #4A3A1E;
+    --text-muted: #7A6840;
+
+    --border: rgba(154, 110, 26, 0.22);
+    --border-hover: rgba(154, 110, 26, 0.55);
+
+    --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow: 0 12px 48px rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.12);
+  }
+}
