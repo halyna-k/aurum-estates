@@ -1,0 +1,24 @@
+.logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: var(--gold);
+  text-decoration: none;
+
+  display: inline-flex;
+  align-items: baseline;
+
+  transition: color var(--transition-medium);
+}
+
+.logo:hover {
+  color: var(--gold-light);
+}
+
+.logo span {
+  font-style: italic;
+  color: var(--text-secondary);
+}
