@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "./globals.css";
 
-import { AiAssistant, Footer, Header } from "../components";
+import { AiAssistant, Footer, Header } from "@/components";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-theme="dark">
-      <body className={`${cormorant.variable} ${montserrat.variable} antialiased`}>
-        <div className="min-h-screen flex flex-col">
-          <Header />
-          <main className="flex-1 relative z-0">
-            {children}
-          </main>
-          <Footer />
-          <AiAssistant />
-        </div>
+    <html
+      lang="en"
+      className={`${cormorant.variable} ${montserrat.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="antialiased min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 relative z-0">{children}</main>
+        <Footer />
+        <AiAssistant />
       </body>
     </html>
   );
