@@ -1,0 +1,58 @@
+.card {
+  background: var(--bg-2);
+  padding: 40px 32px;
+
+  transform: translateY(20px);
+  opacity: 0;
+
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease,
+    background 0.3s ease;
+}
+
+/* Animation */
+.card.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card:hover {
+  background: var(--bg-3);
+  transform: translateY(-2px);
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 24px;
+
+  color: var(--gold);
+  transition: border-color 0.3s;
+}
+
+.card:hover .iconWrap {
+  border-color: var(--gold);
+}
+
+.cardTitle {
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 400;
+
+  color: var(--text-primary);
+
+  margin-bottom: 12px;
+}
+
+.cardDesc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
