@@ -1,0 +1,122 @@
+/* Header */
+.header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--z-sticky);
+
+  border-bottom: 1px solid transparent;
+
+  transition:
+    background var(--transition-medium),
+    border-color var(--transition-medium),
+    backdrop-filter var(--transition-medium);
+}
+
+/* Scrolled state */
+.scrolled {
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom-color: var(--border);
+}
+
+/* Navigation */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 88px;
+}
+
+/* Logo */
+.logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.logo span {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* Links */
+.links {
+  list-style: none;
+  display: flex;
+  gap: 36px;
+}
+
+.links a {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  transition: color var(--transition-medium);
+}
+
+.links a:hover {
+  color: var(--gold);
+}
+
+/* CTA */
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 22px;
+
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  background: transparent;
+
+  transition:
+    background var(--transition-medium),
+    color var(--transition-medium),
+    border-color var(--transition-medium),
+    transform var(--transition-fast);
+}
+
+.cta:hover {
+  background: var(--gold);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav {
+    min-height: 72px;
+  }
+
+  .links {
+    display: none;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .cta,
+  .links a {
+    transition: none;
+  }
+
+  .cta:hover {
+    transform: none;
+  }
+}
