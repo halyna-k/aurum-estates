@@ -1,7 +1,7 @@
 /* Base reveal system */
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 24px, 0);
+  transform: translate3d(0, 40px, 0);
 
   will-change: opacity, transform;
 

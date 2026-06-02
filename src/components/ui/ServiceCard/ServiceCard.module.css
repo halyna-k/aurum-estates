@@ -2,17 +2,17 @@
   background: var(--bg-2);
   padding: 40px 32px;
 
-  transform: translateY(20px);
   opacity: 0;
+  transform: translateY(40px);
 
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease,
+    opacity 0.8s var(--ease-smooth),
+    transform 0.8s var(--ease-smooth),
     background 0.3s ease;
+  will-change: opacity, transform;
 }
 
-/* Animation */
-.card.in-view {
+.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -45,12 +45,9 @@
   font-family: var(--font-serif);
   font-size: 21px;
   font-weight: 400;
-
   color: var(--text-primary);
-
   margin-bottom: 12px;
 }
-
 .cardDesc {
   font-size: 13px;
   color: var(--text-secondary);
