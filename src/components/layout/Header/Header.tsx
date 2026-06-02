@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./Header.module.css";
+import { Logo } from "@/components";
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -14,7 +15,6 @@ export default function Header() {
     };
 
     onScroll();
-
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => window.removeEventListener("scroll", onScroll);
@@ -24,25 +24,14 @@ export default function Header() {
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <nav className={`container ${styles.nav}`} aria-label="Main navigation">
 
-        {/* Logo */}
-        <Link href="/" className={styles.logo}>
-          Aurum <span>Estates</span>
-        </Link>
+        <Logo />
 
-        {/* Navigation links */}
         <ul className={styles.links}>
-          <li>
-            <Link href="#services">Services</Link>
-          </li>
-          <li>
-            <Link href="#properties">Properties</Link>
-          </li>
-          <li>
-            <Link href="#contact">Contact</Link>
-          </li>
+          <li><Link href="#services">Services</Link></li>
+          <li><Link href="#properties">Properties</Link></li>
+          <li><Link href="#contact">Contact</Link></li>
         </ul>
 
-        {/* CTA */}
         <Link href="#properties" className={styles.cta}>
           Find a Property
         </Link>

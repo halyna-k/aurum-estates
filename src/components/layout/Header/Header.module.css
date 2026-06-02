@@ -1,4 +1,3 @@
-/* Header */
 .header {
   position: fixed;
   inset: 0 0 auto 0;
@@ -14,7 +13,7 @@
 
 /* Scrolled state */
 .scrolled {
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom-color: var(--border);
@@ -29,28 +28,13 @@
   min-height: 88px;
 }
 
-/* Logo */
-.logo {
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-
-  color: var(--gold);
-  text-decoration: none;
-}
-
-.logo span {
-  font-style: italic;
-  color: var(--text-secondary);
-}
-
 /* Links */
 .links {
   list-style: none;
   display: flex;
   gap: 36px;
+  margin: 0;
+  padding: 0;
 }
 
 .links a {
