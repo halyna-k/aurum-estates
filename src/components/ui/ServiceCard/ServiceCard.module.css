@@ -1,24 +1,7 @@
 .card {
-  background: var(--bg-2);
-  padding: 40px 32px;
-
-  opacity: 0;
-  transform: translateY(40px);
-
-  transition:
-    opacity 0.8s var(--ease-smooth),
-    transform 0.8s var(--ease-smooth),
-    background 0.3s ease;
-  will-change: opacity, transform;
+ padding: 40px 32px;
 }
-
-.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .card:hover {
-  background: var(--bg-3);
   transform: translateY(-2px);
 }
 

@@ -11,12 +11,12 @@ type Props = {
 };
 
 export default function ServiceCard({ title, desc, icon, delay = 0 }: Props) {
-  const ref = useReveal<HTMLDivElement>(styles.visible);
+  const ref = useReveal<HTMLDivElement>("visible");
 
   return (
     <div
       ref={ref}
-      className={styles.card}
+      className={`card ${styles.card}`}
       style={{ transitionDelay: `${delay * 180}ms` }}
     >
       <div className={styles.iconWrap}>{icon}</div>

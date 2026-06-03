@@ -17,12 +17,45 @@
 .section {
   position: relative;
   padding-block: 96px;
+  padding: 100px 60px;
+  background: var(--bg);
 }
 
 @media (min-width: 768px) {
   .section {
     padding-block: 120px;
+    padding: 60px 24px;
   }
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+}
+
+.card {
+  background: var(--bg-2);
+
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(40px);
+
+  transition:
+    opacity 0.8s var(--ease-smooth),
+    transform 0.8s var(--ease-smooth),
+    background 0.3s ease;
+  will-change: opacity, transform;
+}
+
+.card:hover {
+  background: var(--bg-3);
+  cursor: pointer;
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Ornament */
