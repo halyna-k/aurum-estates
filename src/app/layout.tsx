@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Montserrat } from "next/font/google";
 import "./globals.css";
 
-import { AiAssistant, Footer, Header } from "@/components";
+import { BotpressProvider, AiAssistant, Footer, Header } from "@/components";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -41,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-1 relative z-0">{children}</main>
         <Footer />
         <AiAssistant />
+        <BotpressProvider />
       </body>
     </html>
   );
