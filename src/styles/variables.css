@@ -2,6 +2,8 @@
   /* Brand */
   --gold: #C9A84C;
   --gold-light: #E8C97A;
+  --gold-soft: color-mix(in srgb, var(--gold) 13%, transparent);
+  --gold-border: color-mix(in srgb, var(--gold) 26%, transparent);
 
   /* Background */
   --bg: #0A0A0A;
