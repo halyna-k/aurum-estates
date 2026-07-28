@@ -1,4 +1,4 @@
-import { AgencyServices, Hero, PropertiesList } from "@/components";
+import { AIChatBot, AgencyServices, Hero, PropertiesList } from "@/components";
 
 export default function Home() {
   return (
@@ -6,6 +6,7 @@ export default function Home() {
       <Hero />
       <AgencyServices />
       <PropertiesList />
+      <AIChatBot />
     </>
   );
 }
