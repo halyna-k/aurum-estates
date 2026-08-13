@@ -23,7 +23,7 @@ export default function ChatInput({ ref, input, setInput, loading, send }: ChatI
   return (
     <div className="flex shrink-0 gap-2 border-t border-(--border) bg-(--bg-4) px-3.25 py-2.75">
       <input
-        ref={ref || inputRef}
+        ref={inputRef || ref}
         value={input}
         disabled={loading}
         maxLength={500}

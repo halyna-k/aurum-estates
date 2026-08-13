@@ -5,7 +5,7 @@ import { UIMessage } from "@/types/chat";
 import { formatTime } from "@/lib/helpers";
 
 type ChatMessagesProps = {
-  state: any;
+  state: { gdprConsented: boolean };
   messages: UIMessage[];
   loading: boolean;
 };
