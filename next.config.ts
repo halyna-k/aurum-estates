@@ -1,19 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
-    localPatterns: [
+    formats: ["image/avif", "image/webp"],
+  },
+  async headers() {
+    return [
       {
-        pathname: "/**",
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
       },
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'unsplash.com',
-        pathname: '/photos/**',
-      },
-    ],
+    ];
   },
 };
 
