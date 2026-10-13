@@ -1,94 +1,89 @@
-/* Tailwind CSS */
 @import "tailwindcss";
 
-/* Design system */
 @import "../styles/variables.css";
 @import "../styles/utilities.css";
 @import "../styles/buttons.css";
 @import "../styles/animations.css";
 
-/* Default theme */
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+
+  --color-page: var(--bg);
+  --color-surface: var(--bg-2);
+  --color-surface-2: var(--bg-3);
+  --color-surface-3: var(--bg-4);
+  --color-line: var(--border);
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-brand: var(--gold);
+  --color-brand-hover: var(--gold-hover);
+  --color-on-brand: var(--on-gold);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--error);
+
+  --shadow-panel: var(--shadow);
+}
+@utility bg-hero-glow {
+  background-image: radial-gradient(
+    ellipse 90% 60% at 50% -5%,
+    color-mix(in srgb, var(--gold) 8%, transparent) 0%,
+    transparent 70%
+  );
+}
+
+@utility bg-grid-lines {
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 79px, var(--border) 80px),
+    repeating-linear-gradient(90deg, transparent, transparent 79px, var(--border) 80px);
+}
+
 :root {
-  background: var(--bg, #fff);
-  color: var(--text-primary, #111);
   color-scheme: light dark;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color-scheme: light;
-  }
-}
-
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
+  html {
+    scroll-padding-top: 6rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) var(--bg);
   }
 
-  html {
-    scroll-behavior: smooth;
-    line-height: 1.5;
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
-    margin: 0;
-    min-height: 100vh;
-    overflow-x: hidden;
-
+    min-height: 100dvh;
     background: var(--bg);
     color: var(--text-primary);
-
     font-family: var(--font-sans);
-    font-size: 15px;
-    font-weight: 300;
+    font-size: 0.9375rem;
+    font-weight: 400;
     line-height: 1.7;
-
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  input,
-  textarea,
-  select,
-  button {
-    font: inherit;
   }
 
   a {
-    color: inherit;
-    text-decoration: none;
     transition: color var(--transition-medium);
   }
 
-  img {
-    display: block;
-    max-width: 100%;
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
   }
 
-  button {
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: inherit;
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
   }
 
   ::selection {
     background: var(--gold);
-    color: #fff;
-  }
-
-  ::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--bg);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 2px;
+    color: var(--on-gold);
   }
 }

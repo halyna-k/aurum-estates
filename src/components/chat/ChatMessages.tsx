@@ -1,90 +1,63 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { UIMessage } from "@/types/chat";
-import { formatTime } from "@/lib/helpers";
+import { agency } from "@/agency/config";
+import { formatTime } from "@/lib/format";
+import type { UIMessage } from "@/types/chat";
 
-type ChatMessagesProps = {
-  state: { gdprConsented: boolean };
+interface ChatMessagesProps {
   messages: UIMessage[];
   loading: boolean;
-};
+}
 
-export default function ChatMessages({ state, messages, loading }: ChatMessagesProps) {
-   const bottomRef  = useRef<HTMLDivElement>(null);
+function bubbleClass(message: UIMessage): string {
+  if (message.role === "user") return "self-end rounded-br-sm bg-brand text-on-brand";
+  const border = message.isError ? "border-danger" : "border-line";
+  return `self-start rounded-bl-sm border bg-surface-2 text-ink ${border}`;
+}
 
-  // Scroll to bottom on new message
+export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const { assistantName } = agency.chat;
+
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading, bottomRef]);
-
-  // Render text with line breaks
-  const renderText = (text: string) =>
-    text.split("\n").map((line, i, arr) => (
-      <span key={i}>
-        {line}
-        {i < arr.length - 1 && <br />}
-      </span>
-    ));
+    const list = listRef.current;
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [messages, loading]);
 
   return (
     <div
-      className="
-        flex min-h-45 flex-1 flex-col gap-2.5
-        overflow-y-auto
-        px-3.5 pt-3.5 pb-2
-        scrollbar-thin scrollbar-thumb-border
-      "
+      ref={listRef}
+      role="log"
+      aria-label="Conversation"
+      tabIndex={0}
+      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 [scrollbar-width:thin] motion-safe:scroll-smooth"
     >
-      {/* Empty state */}
-      {messages.length === 0 && state.gdprConsented && !loading && (
-        <div className="flex flex-1 items-center justify-center p-6 text-[12px] text-muted-foreground">
-          <p>Starting conversation…</p>
-        </div>
-      )}
-
-      {messages.map((m) => (
+      {messages.map((message) => (
         <div
-          key={m.id}
-          className={`
-            max-w-[86%]
-            animate-message-in
-            px-3.25 py-2.5
-            text-[13px] leading-[1.6]
-            ${
-              m.role === "bot"
-                ? "self-start rounded-[3px_10px_10px_3px] border border-(--border) bg-(--bg-5) text-(--text-primary)"
-                : "self-end rounded-[10px_3px_3px_10px] border border-(--border) bg-(--bg-5) text-(--text-primary)"
-            }
-            ${
-              m.isError
-                ? "border-red-500/40 bg-red-500/5"
-                : ""
-            }
-          `}
+          key={message.id}
+          className={`animate-message-in max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${bubbleClass(message)}`}
         >
-          <div className="wrap-break-word whitespace-pre-wrap">
-            {renderText(m.text)}
-          </div>
-
-          <div className="mt-1 text-right text-[10px] text-muted-foreground">
-            {formatTime(m.timestamp)}
-          </div>
+          <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
+            <span className="sr-only">{message.role === "user" ? "You" : assistantName} said: </span>
+            {message.text}
+          </p>
+          <time dateTime={message.timestamp.toISOString()} className="mt-1 block text-right text-xs">
+            {formatTime(message.timestamp)}
+          </time>
         </div>
       ))}
 
-      {/* Typing */}
       {loading && (
-        <div className="max-w-[86%] self-start rounded-[3px_10px_10px_3px] border border-(--border) bg-(--bg-5) px-3.25 py-2.5">
-          <div className="flex items-center gap-1 px-0.5 py-1">
-            <span className="block h-1.5 w-1.5 animate-typing-dot rounded-full bg-(--gold)" />
-            <span className="block h-1.5 w-1.5 animate-typing-dot delay-200 rounded-full bg-(--gold)" />
-            <span className="block h-1.5 w-1.5 animate-typing-dot delay-400 rounded-full bg-(--gold)" />
+        <div className="self-start rounded-lg rounded-bl-sm border border-line bg-surface-2 px-3.5 py-3">
+          <span className="sr-only">{assistantName} is typing</span>
+          <div aria-hidden="true" className="flex gap-1">
+            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
+            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
+            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
           </div>
         </div>
       )}
-
-      <div ref={bottomRef} />
     </div>
   );
 }

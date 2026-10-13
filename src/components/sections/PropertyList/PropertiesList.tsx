@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./PropertiesList.module.css";
-import { PROPERTIES } from "@/data/properties";
+import { PROPERTIES } from "@/agency/properties";
 import { PropertyCard, SectionHeader } from "@/components";
 
 export default function PropertiesList() {
@@ -20,7 +20,7 @@ export default function PropertiesList() {
       <div className={`grid ${styles.grid}`}>
         {PROPERTIES.map((p, index) => (
           <PropertyCard
-            key={`${p.address}-${p.price}`}
+            key={`${p.address}-${p.rentPcm}`}
             property={p}
             delay={index * 100}
           />

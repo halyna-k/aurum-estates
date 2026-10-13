@@ -1,121 +1,60 @@
-type ChatFABProps = {
+import type { Ref } from "react";
+import { agency } from "@/agency/config";
+
+interface ChatFABProps {
+  ref?: Ref<HTMLButtonElement>;
   open: boolean;
   unread: number;
   pulse: boolean;
+  panelId: string;
   onClick: () => void;
-};
+}
 
-export default function ChatFAB({ open, pulse, unread, onClick }:ChatFABProps) {
-
-  const tooltipText = open ? "Close AI assistant" : "Open AI rental assistant";
+export default function ChatFAB({ ref, open, unread, pulse, panelId, onClick }: ChatFABProps) {
+  const { assistantName } = agency.chat;
 
   return (
     <button
+      ref={ref}
+      type="button"
       onClick={onClick}
-      aria-label={tooltipText}
-      className={`
-        group fixed bottom-7 right-7 z-301
-        flex h-14 w-14 items-center justify-center
-        rounded-full
-        transition-[background,transform,box-shadow] duration-300
-        ${
-          open
-            ? "bg-(--bg-5) text-primary shadow-custom hover:bg-bg-4"
-            : "bg-(--gold) text-white shadow-[0_4px_20px_color-mix(in_srgb,var(--gold)_40%,transparent)] hover:scale-[1.08] hover:bg-gold-light"
-        }
-        ${pulse && !open ? "animate-fab-pulse relative" : ""}
-      `}
+      aria-expanded={open}
+      aria-controls={panelId}
+      aria-label={`Chat with ${assistantName}, our AI assistant`}
+      className={`group fixed right-3 bottom-7 z-(--z-modal) grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${
+        pulse ? "animate-fab-pulse" : ""
+      }`}
     >
-      {/* Chat icon */}
-      <span
-        className={`
-          absolute flex items-center justify-center
-          transition-[opacity,transform] duration-200
-          ${
-            open
-              ? "pointer-events-none scale-50 opacity-0"
-              : "scale-100 opacity-100"
-          }
-        `}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="size-6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="22"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-        >
-          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-        </svg>
-      </span>
+        {open ? (
+          <path d="M18 6 6 18M6 6l12 12" />
+        ) : (
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        )}
+      </svg>
 
-      {/* Close icon */}
-      <span
-        className={`
-          absolute flex items-center justify-center
-          transition-[opacity,transform] duration-200
-          ${
-            !open
-              ? "pointer-events-none scale-50 opacity-0"
-              : "scale-100 opacity-100"
-          }
-        `}
-      >
-        <svg
-          viewBox="0 0 24 24"
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.2"
-        >
-          <path d="M18 6L6 18M6 6l12 12" />
-        </svg>
-      </span>
-
-      {/* Unread badge */}
       {!open && unread > 0 && (
         <span
-            className="
-            absolute -right-0.5 -top-0.5
-            flex h-4.5 min-w-4.5
-            items-center justify-center
-            rounded-full
-            border-2 border(--bg-2)
-            bg-red-500
-            px-1
-            text-[10px]
-            font-bold
-            text-white
-          "
-        >
-          {unread}
-        </span>
+          aria-hidden="true"
+          className="absolute -top-0.5 -right-0.5 size-4 rounded-full border-2 border-surface bg-danger"
+        />
       )}
 
-      {/* Tooltip */}
       {!open && (
         <span
-          className="
-            pointer-events-none absolute right-16 top-1/2
-            -translate-y-1/2
-            whitespace-nowrap
-            rounded
-            border border-(--border)
-            bg-(--bg-4)
-            px-3 py-1.5
-            text-[11px]
-            font-medium
-            text-(--text-primary)
-            shadow-custom
-            opacity-0
-            transition-opacity duration-200
-            group-hover:opacity-100
-            max-sm:hidden
-          "
+          aria-hidden="true"
+          className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 rounded-md border border-line bg-surface-3 px-4 py-2 text-xs font-medium whitespace-nowrap text-ink opacity-0 shadow-panel transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 max-sm:hidden"
         >
-          Chat with Aura AI
+          Chat with {assistantName}
         </span>
       )}
     </button>
