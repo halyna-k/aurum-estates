@@ -7,7 +7,6 @@ export const PROPERTIES: Property[] = [
     type: "flat",
     image: {
       src:"/images/properties/brook-street-14.jpg",
-      // src: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=75",
       alt: "Living room of a three-bedroom flat",
     },
     area: "Mayfair",
@@ -27,14 +26,13 @@ export const PROPERTIES: Property[] = [
     type: "flat",
     image: {
       src: "/images/properties/cadogan-place-7.jpg",
-      // src: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=75",
       alt: "Exterior of a modern residential building",
     },
     area: "Chelsea",
     address: "7 Cadogan Place, Chelsea, SW3",
     rentPcm: 3200,
     deposit: 3692,
-    availableFrom: "2026-10-01",
+    availableFrom: inDays(14),
     furnishing: "furnished",
     councilTaxBand: "E",
     epcRating: "D",
@@ -47,7 +45,6 @@ export const PROPERTIES: Property[] = [
     type: "flat",
     image: {
       src: "/images/properties/bethnal-green-road-23.jpg",
-      // src: "https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800&q=75",
       alt: "Open-plan living area of a one-bedroom flat",
     },
     area: "Shoreditch",

@@ -18,7 +18,7 @@ const leadFieldShape = {
   bedrooms: z.number().int().min(0).max(10),
   budget: z.number().positive().max(100_000),
   area: text(200),
-  moveInDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  moveInDate: z.iso.date(),
   employmentStatus: z.enum(EMPLOYMENT_STATUSES),
   annualIncome: z.number().min(0).max(10_000_000),
   hasGuarantor: z.boolean(),

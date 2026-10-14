@@ -13,7 +13,7 @@ import {
 } from "@/lib/chat/schemas";
 import { buildLead, hasContact } from "@/lib/leads/build";
 import { saveLead } from "@/lib/leads/stores/memory";
-import { isRateLimited } from "@/lib/rate-limit";
+import { isRateLimited } from "@/lib/rateLimit";
 import type { AgentPreview, ChatReply, LeadField } from "@/types/chat";
 
 const MAX_BODY_CHARS = 100_000;

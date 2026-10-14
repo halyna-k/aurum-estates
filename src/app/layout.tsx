@@ -10,7 +10,7 @@ import Footer from "@/components/layout/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: process.env.SITE_URL,
+  metadataBase: process.env.SITE_URL ? new URL(process.env.SITE_URL) : undefined,
   title: { default: agency.brand.name, template: `%s | ${agency.brand.name}` },
   description: agency.brand.description,
   // A fictional agency must not appear in search results.
