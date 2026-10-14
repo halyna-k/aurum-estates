@@ -12,7 +12,10 @@ const text = (max: number) => z.string().trim().min(1).max(max);
 const leadFieldShape = {
   fullName: text(200),
   email: z.string().trim().toLowerCase().email().max(320),
-  phone: z.string().trim().regex(/^[+\d\s()-]{7,20}$/),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^[+\d\s()-]{7,20}$/),
   propertyId: text(100),
   propertyType: z.enum(PROPERTY_TYPES),
   bedrooms: z.number().int().min(0).max(10),

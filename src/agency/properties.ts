@@ -6,7 +6,7 @@ export const PROPERTIES: Property[] = [
     id: "brook-street-14",
     type: "flat",
     image: {
-      src:"/images/properties/brook-street-14.jpg",
+      src: "/images/properties/brook-street-14.jpg",
       alt: "Living room of a three-bedroom flat",
     },
     area: "Mayfair",

@@ -9,7 +9,7 @@ interface RevealProps {
   delayMs?: number;
 }
 
-export function Reveal({ children, className, delayMs }: RevealProps) {
+export default function Reveal({ children, className, delayMs }: RevealProps) {
   const ref = useReveal<HTMLDivElement>();
 
   return (

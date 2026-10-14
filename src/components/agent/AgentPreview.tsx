@@ -18,11 +18,21 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
     ["Name", lead.fullName],
     ["Email", lead.email],
     ["Phone", lead.phone],
-    ["Looking for", lead.bedrooms === undefined ? undefined : lead.bedrooms === 0 ? "Studio" : `${lead.bedrooms} bed`],
+    [
+      "Looking for",
+      lead.bedrooms === undefined
+        ? undefined
+        : lead.bedrooms === 0
+          ? "Studio"
+          : `${lead.bedrooms} bed`,
+    ],
     ["Area", lead.area],
     ["Budget", lead.budget === undefined ? undefined : `${formatGbp(lead.budget)} pcm`],
     ["Move-in", lead.moveInDate],
-    ["Income", lead.annualIncome === undefined ? undefined : `${formatGbp(lead.annualIncome)} a year`],
+    [
+      "Income",
+      lead.annualIncome === undefined ? undefined : `${formatGbp(lead.annualIncome)} a year`,
+    ],
     ["Guarantor", yesNo(lead.hasGuarantor)],
     ["Occupants", lead.occupants?.toString()],
     ["Pets", yesNo(lead.hasPets)],
@@ -32,7 +42,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
   return (
     <aside
       aria-label="Demo: what the agent receives"
-      className="fixed right-[27rem] bottom-24 z-(--z-modal) hidden w-72 rounded-lg border border-line bg-surface p-4 shadow-panel lg:block"
+      className="fixed right-[27rem] bottom-24 z-50 hidden w-72 rounded-lg border border-line bg-surface p-4 shadow-panel lg:block"
     >
       <p className="text-xs text-ink-muted">
         Demo only. This is what the agent receives in the lead sheet. Applicants never see this
@@ -51,7 +61,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
           value ? (
             <div key={label} className="contents">
               <dt className="text-ink-muted">{label}</dt>
-              <dd className="text-ink [overflow-wrap:anywhere]">{value}</dd>
+              <dd className="[overflow-wrap:anywhere] text-ink">{value}</dd>
             </div>
           ) : null,
         )}

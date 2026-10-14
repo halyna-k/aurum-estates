@@ -6,7 +6,14 @@ export type IsoDate = string;
 /** ISO 8601 date-time, e.g. "2026-10-06T14:30:00Z" */
 export type IsoDateTime = string;
 
-export const EMPLOYMENT_STATUSES = ["employed", "self_employed", "student", "retired", "unemployed", "other"] as const;
+export const EMPLOYMENT_STATUSES = [
+  "employed",
+  "self_employed",
+  "student",
+  "retired",
+  "unemployed",
+  "other",
+] as const;
 export type EmploymentStatus = (typeof EMPLOYMENT_STATUSES)[number];
 
 export const LEAD_STATUSES = ["new", "viewing_requested", "viewing_booked", "closed"] as const;

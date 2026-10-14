@@ -1,12 +1,16 @@
 import { agency } from "@/agency/config";
 import { PROPERTIES } from "@/agency/properties";
 import Container from "@/components/ui/Container";
-import PropertyCard from "@/components/ui/PropertyCard";
+import PropertyCard from "@/components/property/PropertyCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 export default function PropertiesList() {
   return (
-    <section id="properties" aria-labelledby="properties-title" className="py-8 md:py-16">
+    <section
+      id="properties"
+      aria-labelledby="properties-title"
+      className="relative bg-page py-16 md:py-30"
+    >
       <Container>
         <SectionHeader id="properties-title" {...agency.sections.properties} />
 

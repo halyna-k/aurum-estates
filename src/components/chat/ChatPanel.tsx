@@ -36,14 +36,13 @@ export default function ChatPanel({
 }: ChatPanelProps) {
   const { privacyAcknowledgedAt, privacyDeclined, leadSaved } = state;
 
-
   return (
     <>
       <button
         type="button"
         aria-label="Close chat"
         onClick={onClose}
-        className="fixed inset-0 z-(--z-modal) bg-black/60"
+        className="fixed inset-0 z-50 bg-black/60"
       />
 
       <div
@@ -54,7 +53,7 @@ export default function ChatPanel({
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
         }}
-        className="animate-panel-in fixed right-3 sm:right-7 bottom-24 z-[calc(var(--z-modal)+1)] flex h-[min(36rem,calc(100dvh-8rem))] w-[min(23.75rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel"
+        className="animate-panel-in fixed right-3 bottom-24 z-50 flex h-[min(36rem,calc(100dvh-8rem))] w-[min(23.75rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel sm:right-7"
       >
         <ChatHeader onClose={onClose} />
         <ChatMessages messages={messages} loading={loading} />
@@ -62,8 +61,8 @@ export default function ChatPanel({
         <div role="status">
           {leadSaved && (
             <NotificationBar tone="success">
-              Your details have been sent to the team. An agent will reply during working hours
-              ({agency.chat.humanContact.hours}).
+              Your details have been sent to the team. An agent will reply during working hours (
+              {agency.chat.humanContact.hours}).
             </NotificationBar>
           )}
         </div>
@@ -80,9 +79,7 @@ export default function ChatPanel({
           </div>
         )}
 
-        {privacyAcknowledgedAt && (
-          <ChatInput ref={inputRef} busy={loading} onSend={onSend} />
-        )}
+        {privacyAcknowledgedAt && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
 
         <ChatFooter agency={agency} />
       </div>

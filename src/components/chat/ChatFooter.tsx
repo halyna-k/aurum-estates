@@ -13,7 +13,7 @@ export default function ChatFooter({ agency }: { agency: AgencyProps }) {
   const linkClass = "underline underline-offset-2 hover:text-ink";
 
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line p-3 sm:p-5 text-xs text-ink-muted">
+    <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line p-3 text-xs text-ink-muted sm:p-5">
       <a href={`tel:${phone.replace(/\s/g, "")}`}>
         Speak to a person: <span className={linkClass}>{phone}</span>
       </a>

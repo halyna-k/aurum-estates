@@ -21,7 +21,7 @@ export default function ChatFAB({ ref, open, unread, pulse, panelId, onClick }: 
       aria-expanded={open}
       aria-controls={panelId}
       aria-label={`Chat with ${assistantName}, our AI assistant`}
-      className={`group fixed right-3 bottom-7 z-(--z-modal) grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${
+      className={`group fixed right-3 bottom-7 z-50 grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${
         pulse ? "animate-fab-pulse" : ""
       }`}
     >

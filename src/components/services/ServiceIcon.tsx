@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import type { ServiceIcon as IconName } from "@/types/service";
+import { SERVICE_ICONS } from "@/types/service";
+
+type IconName = (typeof SERVICE_ICONS)[number];
 
 const ICONS: Record<IconName, ReactNode> = {
   home: (

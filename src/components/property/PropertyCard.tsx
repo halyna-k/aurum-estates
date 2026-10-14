@@ -1,6 +1,6 @@
 import Image from "next/image";
-import PropertyDetails from "@/components/ui/PropertyDetails";
-import { Reveal } from "@/components/ui/Reveal";
+import Reveal from "@/components/ui/Reveal";
+import PropertyDetails from "./PropertyDetails";
 import { formatGbp } from "@/lib/format";
 import { FURNISHING_LABELS, availabilityLabel, bedroomsLabel } from "@/lib/property";
 import type { Property } from "@/types/property";
@@ -36,7 +36,6 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
         <article className="flex h-full flex-col overflow-hidden border border-line bg-surface">
           <div className="relative aspect-4/3 overflow-hidden">
             <Image
-              loading="eager"
               src={image.src}
               alt={image.alt}
               fill
@@ -47,7 +46,7 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
               aria-hidden="true"
               className="absolute inset-0 bg-linear-to-b from-black/5 to-black/60"
             />
-            <span className="absolute top-3.5 left-3.5 bg-brand px-3 py-1.5 rounded-md text-xs font-semibold tracking-wider text-on-brand uppercase">
+            <span className="absolute top-3.5 left-3.5 rounded-md bg-brand px-3 py-1.5 text-xs font-semibold tracking-wider text-on-brand uppercase">
               {availabilityLabel(property.availableFrom)}
             </span>
             <span className="absolute bottom-3 left-3.5 font-serif text-xs tracking-[0.22em] text-white uppercase">
@@ -55,13 +54,13 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
             </span>
           </div>
 
-          <div className="flex flex-1 flex-col p-5 gap-1">
+          <div className="flex flex-1 flex-col gap-1 p-5">
             <p className="font-serif text-[1.575rem] text-brand">
               {formatGbp(rentPcm)}
               <span className="ml-1 font-sans text-xs text-ink-muted">pcm</span>
             </p>
 
-            <h3 className="line-clamp-2 h-6 text-xs text-ink-secondary">{address}</h3>
+            <h3 className="line-clamp-2 min-h-8 text-xs text-ink-secondary">{address}</h3>
 
             <p className="mb-3 truncate text-xs text-ink">{specs}</p>
 

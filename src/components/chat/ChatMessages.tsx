@@ -31,18 +31,23 @@ export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
       role="log"
       aria-label="Conversation"
       tabIndex={0}
-      className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4 [scrollbar-width:thin] motion-safe:scroll-smooth"
+      className="flex min-h-0 flex-1 [scrollbar-width:thin] flex-col gap-3 overflow-y-auto p-4 motion-safe:scroll-smooth"
     >
       {messages.map((message) => (
         <div
           key={message.id}
           className={`animate-message-in max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${bubbleClass(message)}`}
         >
-          <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
-            <span className="sr-only">{message.role === "user" ? "You" : assistantName} said: </span>
+          <p className="[overflow-wrap:anywhere] whitespace-pre-wrap">
+            <span className="sr-only">
+              {message.role === "user" ? "You" : assistantName} said:{" "}
+            </span>
             {message.text}
           </p>
-          <time dateTime={message.timestamp.toISOString()} className="mt-1 block text-right text-xs">
+          <time
+            dateTime={message.timestamp.toISOString()}
+            className="mt-1 block text-right text-xs"
+          >
             {formatTime(message.timestamp)}
           </time>
         </div>
@@ -52,9 +57,9 @@ export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
         <div className="self-start rounded-lg rounded-bl-sm border border-line bg-surface-2 px-3.5 py-3">
           <span className="sr-only">{assistantName} is typing</span>
           <div aria-hidden="true" className="flex gap-1">
-            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
-            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
-            <span className="size-1.5 animate-typing-dot rounded-full bg-brand" />
+            <span className="animate-typing-dot size-1.5 rounded-full bg-brand" />
+            <span className="animate-typing-dot size-1.5 rounded-full bg-brand" />
+            <span className="animate-typing-dot size-1.5 rounded-full bg-brand" />
           </div>
         </div>
       )}

@@ -21,7 +21,7 @@ export interface AgencyConfig {
     name: string;
     logoSrc?: string;
     description: string;
-    tagline: string
+    tagline: string;
   };
   hero: {
     eyebrow: string;
@@ -33,7 +33,7 @@ export interface AgencyConfig {
   };
   sections: {
     services: SectionCopy;
-    properties: SectionCopy
+    properties: SectionCopy;
   };
   locality: string;
   legal: LegalDetails;
@@ -45,7 +45,7 @@ export interface AgencyConfig {
   leads: {
     notifyEmails: string[];
     // Secrets (sheet ID, credentials, email API key) live in environment variables, not here.
-  }
+  };
   triage: {
     /** Minimum gross annual income as a multiple of annual rent. Internal indicator only. */
     incomeToAnnualRent: number;

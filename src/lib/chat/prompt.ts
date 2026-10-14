@@ -17,7 +17,7 @@ export const FIELD_ORDER = [
   "hasGuarantor",
   "occupants",
   "hasPets",
-  "viewingPreference"
+  "viewingPreference",
 ] as const satisfies readonly (keyof LeadAnswers)[];
 
 export interface PromptState {
@@ -33,8 +33,8 @@ export function buildSystemPrompt(agency: AgencyConfig, state: PromptState): str
     (field) => state.collected[field] === undefined && !state.declined.includes(field),
   );
   const stillToAsk = state.leadSaved
-  ? "The enquiry has already been passed to an agent. Do not ask for further details. Answer questions, and record viewingPreference if the applicant gives preferred days and times."
-  : remaining.join(", ") || "nothing";
+    ? "The enquiry has already been passed to an agent. Do not ask for further details. Answer questions, and record viewingPreference if the applicant gives preferred days and times."
+    : remaining.join(", ") || "nothing";
 
   return `
   You are ${assistantName}, an AI assistant for ${agency.brand.name}, a lettings agency in ${agency.locality}, England. You answer general questions about renting and collect details so that a human agent can follow up. You do not make decisions about applicants.

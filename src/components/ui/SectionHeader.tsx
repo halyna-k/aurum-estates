@@ -18,7 +18,13 @@ function renderTitle(title: string, accent?: string) {
   );
 }
 
-export default function SectionHeader({ id, eyebrow, title, accent, description }: SectionHeaderProps) {
+export default function SectionHeader({
+  id,
+  eyebrow,
+  title,
+  accent,
+  description,
+}: SectionHeaderProps) {
   return (
     <div className="mb-10">
       <div aria-hidden="true" className="mb-6 flex items-center gap-4">

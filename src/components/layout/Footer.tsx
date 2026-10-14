@@ -42,7 +42,10 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href={`tel:${phone.replace(/\s/g, "")}`} className="hover:text-ink hover:underline">
+                <a
+                  href={`tel:${phone.replace(/\s/g, "")}`}
+                  className="hover:text-ink hover:underline"
+                >
                   {phone}
                 </a>
               </li>
@@ -51,19 +54,23 @@ export default function Footer() {
           </section>
         </div>
 
-        <div className="flex flex-col sm:flex-row mt-10 space-y-2 border-t border-line pt-6 text-xxs md:text-xs leading-relaxed text-ink-muted">
+        <div className="text-xxs mt-10 flex flex-col space-y-2 border-t border-line pt-6 leading-relaxed text-ink-muted sm:flex-row md:text-xs">
           {isDemo ? (
             <p className="text-xxs sm:text-xs">
-              {brand.name} is a fictional agency created to demonstrate an AI lettings assistant.<br/>
+              {brand.name} is a fictional agency created to demonstrate an AI lettings assistant.
+              <br />
               Listings, prices and photos are illustrative.
             </p>
           ) : (
             legalLines.map((line) => <p key={line as string}>{line}</p>)
           )}
-          <div className="sm:ml-auto space-y-2 sm:text-right">
+          <div className="space-y-2 sm:ml-auto sm:text-right">
             <p className="text-xxs sm:text-xs">
               &copy; {new Date().getFullYear()} {brand.name}.{" "}
-              <Link href={legal.privacyPolicyUrl} className="ml-3 underline underline-offset-2 hover:text-ink">
+              <Link
+                href={legal.privacyPolicyUrl}
+                className="ml-3 underline underline-offset-2 hover:text-ink"
+              >
                 Privacy notice
               </Link>
             </p>

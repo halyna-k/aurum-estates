@@ -17,8 +17,10 @@ export default function PrivacyNotice({ onAccept, onDecline }: PrivacyNoticeProp
 
       <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
         {assistantName} is an AI assistant. {agency.brand.name} will use your name, contact details,
-        rental requirements and income to follow up your enquiry. Your messages are processed by our AI and hosting providers, and we keep your details for up to {months}. You can ask us to show you or delete them at any time. Please do not share sensitive details such as health
-        or religion.
+        rental requirements and income to follow up your enquiry. Your messages are processed by our
+        AI and hosting providers, and we keep your details for up to {months}. You can ask us to
+        show you or delete them at any time. Please do not share sensitive details such as health or
+        religion.
       </p>
 
       {agency.isDemo && (
@@ -33,7 +35,7 @@ export default function PrivacyNotice({ onAccept, onDecline }: PrivacyNoticeProp
           href={privacyPolicyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-ink underline underline-offset-2 ml-1 hover:text-ink-hover"
+          className="hover:text-ink-hover ml-1 text-ink underline underline-offset-2"
         >
           Privacy notice
           <span className="sr-only"> (opens in a new tab)</span>

@@ -12,7 +12,10 @@ export type CouncilTaxBand = (typeof COUNCIL_TAX_BANDS)[number];
 export const FURNISHING = ["furnished", "part_furnished", "unfurnished"] as const;
 export type Furnishing = (typeof FURNISHING)[number];
 
-export interface PropertyImage { src: string; alt: string }
+export interface PropertyImage {
+  src: string;
+  alt: string;
+}
 
 export interface Property {
   id: string;

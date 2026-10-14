@@ -1,9 +1,6 @@
 @import "tailwindcss";
-
-@import "../styles/variables.css";
-@import "../styles/utilities.css";
-@import "../styles/buttons.css";
-@import "../styles/animations.css";
+@import "../agency/theme.css";
+@import "./animations.css";
 
 @theme inline {
   --font-sans: var(--font-body);
@@ -26,6 +23,7 @@
 
   --shadow-panel: var(--shadow);
 }
+
 @utility bg-hero-glow {
   background-image: radial-gradient(
     ellipse 90% 60% at 50% -5%,
@@ -69,7 +67,7 @@
   }
 
   a {
-    transition: color var(--transition-medium);
+    transition: color 0.35s ease;
   }
 
   button:not(:disabled),

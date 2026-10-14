@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 type Variant = "primary" | "secondary";
 
 const BASE =
-  "inline-flex min-h-11 items-center justify-center rounded-md border px-6 text-sm font-medium transition-colors";
+  "inline-flex min-h-11 items-center justify-center rounded-md border px-6 text-xs font-medium tracking-[0.2em] uppercase transition-colors";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "border-brand bg-brand text-on-brand hover:border-brand-hover hover:bg-brand-hover",
@@ -20,7 +20,12 @@ type ButtonProps =
   | (BaseProps & { href: string; onClick?: never; autoFocus?: never })
   | (BaseProps & { href?: never; onClick: () => void; autoFocus?: boolean });
 
-export default function Button({ variant = "primary", className = "", children, ...action }: ButtonProps) {
+export default function Button({
+  variant = "primary",
+  className = "",
+  children,
+  ...action
+}: ButtonProps) {
   const classes = `${BASE} ${VARIANTS[variant]} ${className}`;
 
   if (action.href !== undefined) {

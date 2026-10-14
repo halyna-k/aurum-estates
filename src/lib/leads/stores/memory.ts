@@ -12,8 +12,6 @@ export async function saveLead(lead: LeadData): Promise<void> {
   const existing = leads.get(lead.sessionId);
   leads.set(
     lead.sessionId,
-    existing
-      ? { ...lead, createdAt: existing.createdAt, expiresAt: existing.expiresAt }
-      : lead,
+    existing ? { ...lead, createdAt: existing.createdAt, expiresAt: existing.expiresAt } : lead,
   );
 }
