@@ -17,9 +17,9 @@ export const SERVICES: Service[] = [
   },
   {
     id: "assistant",
-    title: "Aria, our AI assistant",
+    title: "Aura, our AI assistant",
     description:
-      "Ask Aria about the renting process or leave your details at any hour. An agent reviews every enquiry and replies during working hours.",
+      "Ask Aura about the renting process or leave your details at any hour. An agent reviews every enquiry and replies during working hours.",
     icon: "message",
   },
 ];

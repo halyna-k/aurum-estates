@@ -1,13 +1,13 @@
 import type { AgencyConfig } from "@/types/agency";
 
+const assistantName = "Aura";
+
 export const agency: AgencyConfig = {
   id: "aurum-demo",
   isDemo: true,
   brand: {
     name: "Aurum Estates",
-    // logoSrc: "/logo.svg",
-    description:
-      "Flats to rent across London. Ask Aria, our AI assistant, a question or leave your details for an agent to follow up.",
+    description: `Flats to rent across London. Ask ${assistantName}, our AI assistant, a question or leave your details for an agent to follow up.`,
     tagline: "Flats to rent across London.",
   },
   hero: {
@@ -27,8 +27,7 @@ export const agency: AgencyConfig = {
       eyebrow: "What we offer",
       title: "Lettings and landlord services across London",
       accent: "landlord services",
-      description:
-        "From your first question to a viewing, our team and Aria, our AI assistant, are here to help.",
+      description: `From your first question to a viewing, our team and ${assistantName}, our AI assistant, are here to help.`,
     },
     properties: {
       eyebrow: "Featured rentals",
@@ -53,9 +52,8 @@ export const agency: AgencyConfig = {
   },
 
   chat: {
-    assistantName: "Aura",
-    greeting:
-      "Hello, I'm Aura, an AI assistant for Aurum Estates. I can answer general questions about renting and take your details for an agent to follow up. You can speak to a person at any time.",
+    assistantName,
+    greeting: `Hello, I'm ${assistantName}, an AI assistant for Aurum Estates. I can answer general questions about renting and take your details for an agent to follow up. You can speak to a person at any time.`,
     humanContact: {
       phone: "020 7946 0123",
       email: "lettings@aurum-demo.com",
