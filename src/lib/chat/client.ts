@@ -28,10 +28,19 @@ function isChatReply(data: unknown): data is ChatReply {
   );
 }
 
+function withTimeout(outer: AbortSignal | undefined, ms: number) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  outer?.addEventListener("abort", () => controller.abort(), { once: true });
+  return { signal: controller.signal, clear: () => clearTimeout(timer) };
+}
+
 export async function sendMessage(request: ChatRequest, signal?: AbortSignal): Promise<ChatReply> {
   const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
 
+  const { signal: combined, clear } = withTimeout(signal, REQUEST_TIMEOUT_MS);
   let res: Response;
+
   try {
     res = await fetch("/api/chat", {
       method: "POST",
@@ -41,7 +50,9 @@ export async function sendMessage(request: ChatRequest, signal?: AbortSignal): P
     });
   } catch (error) {
     if (signal?.aborted) throw error;
-    throw new Error(timeout.aborted ? TIMEOUT_ERROR : NETWORK_ERROR);
+    throw new Error(combined.aborted ? TIMEOUT_ERROR : NETWORK_ERROR);
+  } finally {
+    clear();
   }
 
   const data: unknown = await res.json().catch(() => null);
@@ -50,6 +61,5 @@ export async function sendMessage(request: ChatRequest, signal?: AbortSignal): P
   if (!res.ok) throw new Error(readError(data) ?? FALLBACK_ERROR);
   if (!isChatReply(data)) throw new Error(FALLBACK_ERROR);
 
-  console.log("Chat API response:", data);
   return data;
 }
