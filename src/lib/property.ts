@@ -30,5 +30,5 @@ export function availabilityLabel(availableFrom: IsoDate, today = new Date()): s
     timeZone: "UTC",
   }).format(date);
 
-  return `${formatted}`;
+  return formatted;
 }

@@ -1,5 +1,11 @@
 import type { Property } from "@/types/property";
-import { inDays } from "@/lib/format";
+import type { IsoDate } from "@/types/lead";
+
+export function inDays(days: number): IsoDate {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+}
 
 export const PROPERTIES: Property[] = [
   {

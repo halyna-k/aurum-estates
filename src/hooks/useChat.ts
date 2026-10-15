@@ -36,7 +36,7 @@ export function useChat() {
 
   useEffect(() => {
     if (!open || !acknowledged) return;
-    const id = requestAnimationFrame(() => inputRef.current?.focus());
+    const id = requestAnimationFrame(() => fabRef.current?.focus());
     return () => cancelAnimationFrame(id);
   }, [open, acknowledged]);
 

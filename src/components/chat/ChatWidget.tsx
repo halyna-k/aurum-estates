@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { useChat } from "@/hooks/useChat";
-import ChatFAB from "./ChatFAB";
+import ChatFAB from "./ChatLauncher";
 import ChatPanel from "./ChatPanel";
 import { agency } from "@/agency/config";
 import AgentPreview from "@/components/agent/AgentPreview";

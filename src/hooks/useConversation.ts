@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { agency } from "@/agency/config";
 import { MAX_MESSAGE_LENGTH } from "@/lib/chat/limits";
-import { sendMessage } from "@/services/chatApi";
+import { sendMessage } from "@/lib/chat/client";
 import type { ChatMessage, ConversationState, UIMessage } from "@/types/chat";
 
 const initialState: ConversationState = {

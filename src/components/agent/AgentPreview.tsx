@@ -2,7 +2,7 @@ import { formatGbp } from "@/lib/format";
 import { STATUS_LABELS } from "@/lib/leads/labels";
 import type { AgentPreview as Preview } from "@/types/chat";
 import type { LeadAnswers } from "@/types/lead";
-import TriageBadge from "../chat/TriageBadge";
+import TriageBadge from "./TriageBadge";
 
 interface AgentPreviewProps {
   preview: Preview;
@@ -26,6 +26,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
           ? "Studio"
           : `${lead.bedrooms} bed`,
     ],
+    ["Property Type", lead.propertyType],
     ["Area", lead.area],
     ["Budget", lead.budget === undefined ? undefined : `${formatGbp(lead.budget)} pcm`],
     ["Move-in", lead.moveInDate],
@@ -33,6 +34,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
       "Income",
       lead.annualIncome === undefined ? undefined : `${formatGbp(lead.annualIncome)} a year`,
     ],
+    ["Employment Status", lead.employmentStatus],
     ["Guarantor", yesNo(lead.hasGuarantor)],
     ["Occupants", lead.occupants?.toString()],
     ["Pets", yesNo(lead.hasPets)],
