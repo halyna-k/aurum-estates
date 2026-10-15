@@ -1,7 +1,7 @@
 import type { Ref } from "react";
 import { agency } from "@/agency/config";
 
-interface ChatFABProps {
+interface ChatLauncherProps {
   ref?: Ref<HTMLButtonElement>;
   open: boolean;
   unread: number;
@@ -10,7 +10,14 @@ interface ChatFABProps {
   onClick: () => void;
 }
 
-export default function ChatFAB({ ref, open, unread, pulse, panelId, onClick }: ChatFABProps) {
+export default function ChatLauncher({
+  ref,
+  open,
+  unread,
+  pulse,
+  panelId,
+  onClick,
+}: ChatLauncherProps) {
   const { assistantName } = agency.chat;
 
   return (
@@ -21,7 +28,7 @@ export default function ChatFAB({ ref, open, unread, pulse, panelId, onClick }: 
       aria-expanded={open}
       aria-controls={panelId}
       aria-label={`Chat with ${assistantName}, our AI assistant`}
-      className={`group fixed right-3 bottom-7 z-50 grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${
+      className={`group fixed right-3 bottom-7 z-50 grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${open ? "max-sm:hidden" : ""} ${
         pulse ? "animate-fab-pulse" : ""
       }`}
     >
@@ -52,7 +59,7 @@ export default function ChatFAB({ ref, open, unread, pulse, panelId, onClick }: 
       {!open && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 rounded-md border border-line bg-surface-3 px-4 py-2 text-xs font-medium whitespace-nowrap text-ink opacity-0 shadow-panel transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 max-sm:hidden"
+          className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 rounded-md border border-line bg-surface-3 px-4 py-2 text-xs font-medium whitespace-nowrap text-ink opacity-0 shadow-panel transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
         >
           Chat with {assistantName}
         </span>
