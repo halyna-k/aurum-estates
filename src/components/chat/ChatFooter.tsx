@@ -1,14 +1,6 @@
-interface AgencyProps {
-  chat: {
-    humanContact: {
-      phone: string;
-    };
-  };
-  legal: {
-    privacyPolicyUrl: string;
-  };
-}
-export default function ChatFooter({ agency }: { agency: AgencyProps }) {
+import { agency } from "@/agency/config";
+
+export default function ChatFooter() {
   const { phone } = agency.chat.humanContact;
   const linkClass = "underline underline-offset-2 hover:text-ink";
 
@@ -27,10 +19,5 @@ export default function ChatFooter({ agency }: { agency: AgencyProps }) {
         <span className="sr-only"> (opens in a new tab)</span>
       </a>
     </div>
-    // <div className="flex shrink-0 items-center justify-center gap-1.5 border-t border-border bg-bg-3 px-3.5 py-2 text-1 tracking-[0.04em] text-muted-foreground opacity-60">
-    //   <span>·</span>
-    //   <span>UK GDPR compliant</span>
-    //   <span>·</span>
-    // </div>
   );
 }
