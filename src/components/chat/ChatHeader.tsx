@@ -21,7 +21,7 @@ export default function ChatHeader({ onClose }: { onClose: () => void }) {
         type="button"
         onClick={onClose}
         aria-label="Close chat"
-        className="grid size-6 shrink-0 place-items-center rounded-md text-ink-muted transition-colors hover:text-ink"
+        className="grid size-11 shrink-0 place-items-center rounded-md text-ink-muted transition-colors hover:text-ink"
       >
         <svg
           aria-hidden="true"

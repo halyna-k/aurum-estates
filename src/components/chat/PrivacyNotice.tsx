@@ -35,7 +35,7 @@ export default function PrivacyNotice({ onAccept, onDecline }: PrivacyNoticeProp
           href={privacyPolicyUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-ink-hover ml-1 text-ink underline underline-offset-2"
+          className="ml-1 text-ink underline underline-offset-2 hover:text-brand"
         >
           Privacy notice
           <span className="sr-only"> (opens in a new tab)</span>

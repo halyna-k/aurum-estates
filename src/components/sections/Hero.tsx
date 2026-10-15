@@ -9,7 +9,7 @@ export default function Hero() {
     <section className="relative isolate flex min-h-[95dvh] items-center overflow-hidden bg-page bg-hero-glow py-16 md:py-30">
       <div
         aria-hidden="true"
-        className="bg-grid-lines pointer-events-none absolute inset-0 -z-10 opacity-25"
+        className="pointer-events-none absolute inset-0 -z-10 bg-grid-lines opacity-25"
       />
 
       <Container className="animate-hero-in text-center">

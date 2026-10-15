@@ -53,7 +53,7 @@ export default function ChatPanel({
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
         }}
-        className="animate-panel-in fixed right-3 bottom-24 z-50 flex h-[min(36rem,calc(100dvh-8rem))] w-[min(23.75rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel sm:right-7"
+        className="animate-panel-in fixed right-3 bottom-24 z-50 flex h-[min(36rem,calc(100dvh-8rem))] w-[min(23.75rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel max-sm:inset-0 max-sm:h-dvh max-sm:w-full max-sm:rounded-none max-sm:border-0 sm:right-7"
       >
         <ChatHeader onClose={onClose} />
         <ChatMessages messages={messages} loading={loading} />

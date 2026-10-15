@@ -10,7 +10,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 focus:z-100 border-b border-line bg-page/80 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-page/80 backdrop-blur focus:z-100">
       <Container className="flex flex-wrap items-center justify-between gap-x-8 py-2">
         <Logo />
 
