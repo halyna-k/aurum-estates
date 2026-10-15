@@ -22,6 +22,17 @@
   }
 }
 
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes blink {
   0%,
   100% {
@@ -71,6 +82,9 @@
   .animate-hero-in {
     animation: hero-in 0.8s ease-out both;
   }
+  .animate-panel-in {
+    animation: panel-in 0.2s ease-out;
+  }
 
   .animate-blink {
     animation: blink 2s infinite;
@@ -105,6 +119,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .animate-hero-in,
+    .animate-panel-in,
     .animate-blink,
     .animate-message-in,
     .animate-typing-dot,
