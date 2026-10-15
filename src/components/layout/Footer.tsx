@@ -54,15 +54,17 @@ export default function Footer() {
           </section>
         </div>
 
-        <div className="text-xxs mt-10 flex flex-col space-y-2 border-t border-line pt-6 leading-relaxed text-ink-muted sm:flex-row md:text-xs">
+        <div className="text-xxs mt-10 flex flex-col gap-4 border-t border-line pt-6 leading-relaxed text-ink-muted sm:flex-row md:text-xs">
           {isDemo ? (
-            <p className="text-xxs sm:text-xs">
+            <p className="text-xs">
               {brand.name} is a fictional agency created to demonstrate an AI lettings assistant.
               <br />
               Listings, prices and photos are illustrative.
             </p>
           ) : (
-            legalLines.map((line) => <p key={line as string}>{line}</p>)
+            legalLines
+              .filter((line): line is string => Boolean(line))
+              .map((line) => <p key={line}>{line}</p>)
           )}
           <div className="space-y-2 sm:ml-auto sm:text-right">
             <p className="text-xxs sm:text-xs">

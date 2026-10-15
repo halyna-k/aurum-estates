@@ -7,14 +7,14 @@ export default function Hero() {
 
   return (
     <section className="relative isolate flex min-h-[95dvh] items-center overflow-hidden bg-page bg-hero-glow py-16 md:py-30">
-      {/* <div
+      <div
         aria-hidden="true"
         className="bg-grid-lines pointer-events-none absolute inset-0 -z-10 opacity-25"
-      /> */}
+      />
 
       <Container className="animate-hero-in text-center">
-        <div className="pointer-events-none">
-          <p className="flex items-center justify-center gap-4 text-xs tracking-[0.32em] text-brand uppercase before:h-px before:w-10 before:bg-brand/45 before:content-[''] after:h-px after:w-10 after:bg-brand/45 after:content-['']">
+        <div>
+          <p className="flex items-center justify-center gap-4 text-xs tracking-[0.32em] text-brand uppercase">
             {eyebrow}
           </p>
 
@@ -37,7 +37,7 @@ export default function Hero() {
           </Button>
         </div>
 
-        <dl className="mt-16 grid border-y border-line sm:grid-cols-3">
+        <dl className="mt-16 grid border-y border-line sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
           {facts.map(({ value, label }) => (
             <div
               key={label}
