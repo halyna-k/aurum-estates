@@ -81,7 +81,7 @@ export default function ChatPanel({
 
         {privacyAcknowledgedAt && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
 
-        <ChatFooter agency={agency} />
+        <ChatFooter />
       </div>
     </>
   );
