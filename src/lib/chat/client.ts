@@ -36,17 +36,15 @@ function withTimeout(outer: AbortSignal | undefined, ms: number) {
 }
 
 export async function sendMessage(request: ChatRequest, signal?: AbortSignal): Promise<ChatReply> {
-  const timeout = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
-
   const { signal: combined, clear } = withTimeout(signal, REQUEST_TIMEOUT_MS);
-  let res: Response;
 
+  let res: Response;
   try {
     res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
-      signal: signal ? AbortSignal.any([signal, timeout]) : timeout,
+      signal: combined,
     });
   } catch (error) {
     if (signal?.aborted) throw error;
