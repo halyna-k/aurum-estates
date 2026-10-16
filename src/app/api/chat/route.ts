@@ -11,13 +11,14 @@ import {
   parseFields,
   parseLeadAnswers,
 } from "@/lib/chat/schemas";
-import { buildLead, hasContact } from "@/lib/leads/build";
+import { buildLead, hasContact } from "@/lib/leads/buildLead";
 import { saveLead } from "@/lib/leads/stores/memory";
 import { isRateLimited } from "@/lib/rateLimit";
-import type { AgentPreview, ChatReply, LeadField } from "@/types/chat";
+import type { AgentPreviewData, ChatReply, LeadField } from "@/types/chat";
+import { MAX_BODY_CHARS, MAX_HISTORY_MESSAGES } from "@/lib/chat/limits";
 
-const MAX_BODY_CHARS = 100_000;
-const MAX_HISTORY_MESSAGES = 12;
+export const maxDuration = 30;
+
 const REQUIRED_FIELDS: LeadField[] = ["fullName", "email"];
 
 let groqClient: Groq | undefined;
@@ -52,7 +53,11 @@ function clientKey(req: NextRequest): string {
 }
 
 function todayInLondon(): string {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(new Date());
+  const now = new Date();
+  const zone = { timeZone: "Europe/London" } as const;
+  const long = new Intl.DateTimeFormat("en-GB", { ...zone, dateStyle: "full" }).format(now);
+  const iso = new Intl.DateTimeFormat("en-CA", zone).format(now);
+  return `${long} (${iso})`;
 }
 
 export async function POST(req: NextRequest) {
@@ -133,7 +138,7 @@ export async function POST(req: NextRequest) {
   );
 
   let leadSaved = request.leadSaved;
-  let agentPreview: AgentPreview | undefined;
+  let agentPreview: AgentPreviewData | undefined;
 
   // Save once the applicant has confirmed, and update the lead on later turns.
   if (remaining.length === 0 && hasContact(leadData) && (output.confirmed || request.leadSaved)) {
