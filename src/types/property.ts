@@ -21,8 +21,7 @@ export interface Property {
   id: string;
   type: PropertyType;
   image: PropertyImage;
-  /** Short label for the card, e.g. "New listing". Display only. */
-  badge?: string;
+
   /** Neighbourhood, e.g. "Canonbury". */
   area: string;
   address: string;

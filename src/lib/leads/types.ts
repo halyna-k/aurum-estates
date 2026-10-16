@@ -1,6 +1,6 @@
 import type { LeadData } from "@/types/lead";
 
-/** Primary storage. A failure here must be reported to the applicant. */
+/** Primary storage. A failure is reported to the applicant. */
 export interface LeadStore {
   /** Creates the lead, or updates it if the same sessionId was saved before. */
   upsert(lead: LeadData): Promise<{ reference: string }>;
@@ -8,7 +8,7 @@ export interface LeadStore {
   deleteByEmail(email: string): Promise<number>;
 }
 
-/** Secondary delivery (email, CRM). A failure is logged and retried, never shown to the applicant. */
+/** Secondary delivery (email, CRM). A failure is logged, not shown to the applicant. */
 export interface LeadNotifier {
   notify(lead: LeadData, reference: string): Promise<void>;
 }

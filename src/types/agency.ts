@@ -42,9 +42,9 @@ export interface AgencyConfig {
     greeting: string;
     humanContact: { phone: string; email: string; hours: string };
   };
+  // Secrets (sheet ID, credentials, email API key) live in environment variables, not here.
   leads: {
     notifyEmails: string[];
-    // Secrets (sheet ID, credentials, email API key) live in environment variables, not here.
   };
   triage: {
     /** Minimum gross annual income as a multiple of annual rent. Internal indicator only. */

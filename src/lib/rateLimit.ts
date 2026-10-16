@@ -4,11 +4,7 @@ const MAX_ENTRIES = 5_000;
 
 const hits = new Map<string, { count: number; resetAt: number }>();
 
-/**
- * In-memory limiter, enough for a demo on one instance. On serverless every
- * instance has its own map, so production needs a shared store such as
- * Upstash Redis or Vercel KV, plus a daily spending cap at the model provider.
- */
+/** In-memory limiter for a single-instance demo. Serverless needs a shared store (Upstash, Vercel KV). */
 export function isRateLimited(key: string): boolean {
   const now = Date.now();
 
