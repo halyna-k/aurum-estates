@@ -1,77 +1,123 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
-import type { UIMessage, ConversationState, ChatMessage } from "@/types/chat";
-import { generateId } from "@/lib/helpers";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { agency } from "@/agency/config";
+import { MAX_MESSAGE_LENGTH } from "@/lib/chat/limits";
+import { sendMessage } from "@/lib/chat/client";
+import type { ChatMessage, ConversationState, UIMessage } from "@/types/chat";
+
+const initialState: ConversationState = {
+  leadData: {},
+  declinedFields: [],
+  leadSaved: false,
+  privacyDeclined: false,
+};
+
+const GENERIC_ERROR = "Sorry, something went wrong. Please try again.";
+
+function createGreeting(): UIMessage {
+  return {
+    id: "greeting",
+    role: "assistant",
+    text: agency.chat.greeting,
+    timestamp: new Date(),
+  };
+}
+
+/** The model sees the conversation without error notices and system messages. */
+function toHistory(messages: UIMessage[]): ChatMessage[] {
+  return messages.flatMap((m) =>
+    m.isError || m.role === "system" ? [] : [{ role: m.role, content: m.text }],
+  );
+}
 
 export function useConversation() {
-  const [messages, setMessages] = useState<UIMessage[]>([]);
-  const [loading, setLoading]   = useState(false);
-  const [state, setState]       = useState<ConversationState>({
-    gdprConsented:     false,
-    leadData:          {},
-    leadSaved:         false,
-    viewingRequested:  false,
-  });
+  const [messages, setMessages] = useState<UIMessage[]>(() => [createGreeting()]);
+  const [state, setState] = useState<ConversationState>(initialState);
+  const [loading, setLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
 
-  // Full conversation history sent to /api/chat on every request
-  const historyRef = useRef<ChatMessage[]>([]);
+  const controllerRef = useRef<AbortController | null>(null);
 
-  //  Add a message to the UI
-  const addMessage = useCallback(
-    (role: UIMessage["role"], text: string, isError = false) => {
-      setMessages((prev) => [
-        ...prev,
-        { id: generateId(), role, text, timestamp: new Date(), isError },
-      ]);
-    },
-    []
-  );
+  useEffect(() => () => controllerRef.current?.abort(), []);
 
-  // Push to API history
-  const pushToHistory = useCallback((msg: ChatMessage) => {
-    historyRef.current.push(msg);
+  const addMessage = useCallback((role: UIMessage["role"], text: string, isError = false) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), role, text, timestamp: new Date(), isError },
+    ]);
   }, []);
 
-  const resetHistory = useCallback((initial: ChatMessage[]) => {
-    historyRef.current = initial;
+  const acknowledgePrivacyNotice = useCallback(() => {
+    setState((prev) => ({ ...prev, privacyAcknowledgedAt: new Date().toISOString() }));
   }, []);
 
-  // State setters
-  const setGdprConsented = useCallback(() => {
-    setState((s) => ({ ...s, gdprConsented: true }));
+  const declinePrivacyNotice = useCallback(() => {
+    const { phone, email, hours } = agency.chat.humanContact;
+    setState((prev) => ({ ...prev, privacyDeclined: true }));
+    addMessage(
+      "assistant",
+      `No problem, nothing has been collected. You can reach the team on ${phone} or at ${email} (${hours}).`,
+    );
+  }, [addMessage]);
+
+  const send = useCallback(
+    async (text: string) => {
+      const content = text.trim().slice(0, MAX_MESSAGE_LENGTH);
+      const { privacyAcknowledgedAt, leadData, declinedFields } = state;
+      if (!content || loading || !privacyAcknowledgedAt) return;
+
+      const controller = new AbortController();
+      controllerRef.current = controller;
+      setLoading(true);
+      addMessage("user", content);
+
+      try {
+        const reply = await sendMessage(
+          {
+            messages: [...toHistory(messages), { role: "user", content }],
+            leadData,
+            declinedFields,
+            leadSaved: state.leadSaved,
+            sessionId,
+            privacyAcknowledgedAt,
+          },
+          controller.signal,
+        );
+
+        setState((prev) => ({
+          ...prev,
+          leadData: reply.leadData,
+          declinedFields: reply.declinedFields,
+          leadSaved: reply.leadSaved,
+          agentPreview: reply.agentPreview ?? prev.agentPreview,
+        }));
+        addMessage("assistant", reply.message);
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        addMessage("assistant", error instanceof Error ? error.message : GENERIC_ERROR, true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    },
+    [state, loading, messages, sessionId, addMessage],
+  );
+
+  const reset = useCallback(() => {
+    controllerRef.current?.abort();
+    setLoading(false);
+    setMessages([createGreeting()]);
+    setState((prev) => ({ ...initialState, privacyAcknowledgedAt: prev.privacyAcknowledgedAt }));
+    setSessionId(crypto.randomUUID());
   }, []);
-
-  const setQualificationScore = useCallback(
-    (score: ConversationState["qualificationScore"]) => {
-      setState((s) => ({ ...s, qualificationScore: score }));
-    },
-    []
-  );
-
-  const setLeadSaved = useCallback(
-    (leadData: ConversationState["leadData"]) => {
-      setState((s) => ({ ...s, leadSaved: true, leadData }));
-    },
-    []
-  );
-
-  const setViewingRequested = useCallback(() => {
-    setState((s) => ({ ...s, viewingRequested: true }));
-  }, []);
-
-  const mergeLeadData = useCallback(
-    (incoming: ConversationState["leadData"]) => {
-      setState((s) => ({ ...s, leadData: { ...s.leadData, ...incoming } }));
-    },
-    []
-  );
 
   return {
-    // UI state
-    messages, loading, state, historyRef,
-
-    // Actions
-    addMessage, pushToHistory, resetHistory, setLoading, setGdprConsented, setQualificationScore, setLeadSaved, setViewingRequested, mergeLeadData
+    messages,
+    state,
+    loading,
+    send,
+    acknowledgePrivacyNotice,
+    declinePrivacyNotice,
+    reset,
   };
 }

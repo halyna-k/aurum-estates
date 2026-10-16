@@ -1,25 +1,50 @@
-import type { ReactNode } from "react";
+interface SectionHeaderProps {
+  id: string;
+  eyebrow: string;
+  title: string;
+  accent?: string;
+  description?: string;
+}
 
-type SectionHeaderProps = {
-  eyebrow?: ReactNode;
-  title?: ReactNode;
-  desc?: ReactNode;
-};
-
-export default function SectionHeader({ eyebrow, title, desc }: SectionHeaderProps) {
+function renderTitle(title: string, accent?: string) {
+  if (!accent || !title.includes(accent)) return title;
+  const [before, ...rest] = title.split(accent);
   return (
     <>
-      <div className="ornament">
-        <div className="ornament-line" />
-        <div className="ornament-diamond" />
-        <div className="ornament-line" />
+      {before}
+      <span className="text-brand italic">{accent}</span>
+      {rest.join(accent)}
+    </>
+  );
+}
+
+export default function SectionHeader({
+  id,
+  eyebrow,
+  title,
+  accent,
+  description,
+}: SectionHeaderProps) {
+  return (
+    <div className="mb-10">
+      <div aria-hidden="true" className="mb-6 flex items-center gap-4">
+        <span className="h-px max-w-20 flex-1 bg-line" />
+        <span className="size-2 shrink-0 rotate-45 bg-brand opacity-65" />
+        <span className="h-px max-w-20 flex-1 bg-line" />
       </div>
 
-      {eyebrow && <div className="section-eyebrow">{eyebrow}</div>}
+      <p className="mb-4 text-xs tracking-[0.32em] text-brand uppercase">{eyebrow}</p>
 
-      {title && <h2 className="section-title">{title}</h2>}
+      <h2
+        id={id}
+        className="mb-4 font-serif text-[clamp(2.125rem,5vw,3.5rem)] leading-[1.1] font-light text-balance text-ink"
+      >
+        {renderTitle(title, accent)}
+      </h2>
 
-      {desc && <p className="section-desc">{desc}</p>}
-    </>
+      {description && (
+        <p className="max-w-[60ch] text-sm leading-[1.85] text-ink-secondary">{description}</p>
+      )}
+    </div>
   );
 }

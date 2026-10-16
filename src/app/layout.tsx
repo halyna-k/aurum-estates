@@ -1,45 +1,38 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Montserrat } from "next/font/google";
+import type { ReactNode } from "react";
+
+import { agency } from "@/agency/config";
+import { bodyFont, displayFont } from "@/agency/fonts";
+import ChatWidget from "@/components/chat/ChatWidget";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+
 import "./globals.css";
 
-import { Header, Footer } from "@/components";
-
-const cormorant = Cormorant_Garamond({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["300", "400", "500"],
-  display: "swap",
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["300", "400", "500", "600"],
-  display: "swap",
-});
-
 export const metadata: Metadata = {
-  title: {
-    default: "Aurum Estates",
-    template: "%s | Aurum Estates",
-  },
-  description: "Premium real estate platform with AI assistant",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: process.env.SITE_URL ? new URL(process.env.SITE_URL) : undefined,
+  title: { default: agency.brand.name, template: `%s | ${agency.brand.name}` },
+  description: agency.brand.description,
+  // A fictional agency must not appear in search results.
+  ...(agency.isDemo && { robots: { index: false, follow: false } }),
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${cormorant.variable} ${montserrat.variable}`}
-      suppressHydrationWarning
-    >
-      <body className="antialiased min-h-screen flex flex-col">
+    <html lang="en-GB" className={`${displayFont.variable} ${bodyFont.variable}`}>
+      <body className="flex min-h-dvh flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-100 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-ink"
+        >
+          Skip to main content
+        </a>
         <Header />
-        <main className="flex-1 relative z-0">{children}</main>
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">
+          {children}
+        </main>
         <Footer />
+        <ChatWidget />
       </body>
     </html>
   );

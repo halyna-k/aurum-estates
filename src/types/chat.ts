@@ -1,32 +1,51 @@
-import { LeadData } from "./lead";
+import type { IsoDateTime, LeadAnswers, LeadStatus } from "./lead";
+import type { LeadQualification } from "./qualification";
+
+export type ChatRole = "user" | "assistant" | "system";
+/** Roles accepted from the client. The server adds the system prompt itself. */
+export type ClientChatRole = Exclude<ChatRole, "system">;
+export type LeadField = keyof LeadAnswers;
 
 export interface UIMessage {
   id: string;
-  role: "bot" | "user";
+  role: ChatRole;
   text: string;
   timestamp: Date;
   isError?: boolean;
 }
 
-export type QualificationScore = "qualified" | "conditional" | "declined";
-
-export interface ConversationState {
-  gdprConsented: boolean;
-  leadData: Partial<LeadData>;
-  qualificationScore?: QualificationScore;
-  leadSaved: boolean;
-  viewingRequested: boolean;
-}
-
 export interface ChatMessage {
-  role: "user" | "assistant" | "system";
+  role: ClientChatRole;
   content: string;
 }
 
-export interface ChatResponse {
-  message: string;
-  action?: "collect" | "qualify" | "book_viewing" | "save_lead";
-  leadData?: LeadData;
-  qualificationScore?: QualificationScore;
-  collectingField?: keyof LeadData;
+/** Demo only. Never sent when agency.isDemo is false. */
+export interface AgentPreviewData {
+  reference: string;
+  qualification: LeadQualification;
+  status: LeadStatus;
 }
+
+export interface ConversationState {
+  privacyAcknowledgedAt?: IsoDateTime;
+  privacyDeclined: boolean;
+  leadData: Partial<LeadAnswers>;
+  declinedFields: LeadField[];
+  leadSaved: boolean;
+  agentPreview?: AgentPreviewData;
+}
+
+export interface ChatRequest {
+  messages: ChatMessage[];
+  leadData: Partial<LeadAnswers>;
+  declinedFields: LeadField[];
+  leadSaved: boolean;
+  sessionId: string;
+  privacyAcknowledgedAt: IsoDateTime;
+}
+
+/** The server's merged view of the lead. The client replaces its own copy with it. */
+export type ChatReply = Pick<ChatRequest, "leadData" | "declinedFields" | "leadSaved"> & {
+  message: string;
+  agentPreview?: AgentPreviewData;
+};
