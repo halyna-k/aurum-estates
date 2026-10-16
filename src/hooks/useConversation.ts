@@ -107,7 +107,7 @@ export function useConversation() {
     controllerRef.current?.abort();
     setLoading(false);
     setMessages([createGreeting()]);
-    setState(initialState);
+    setState((prev) => ({ ...initialState, privacyAcknowledgedAt: prev.privacyAcknowledgedAt }));
     setSessionId(crypto.randomUUID());
   }, []);
 

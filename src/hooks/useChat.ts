@@ -13,7 +13,7 @@ export function useChat() {
   const [seenCount, setSeenCount] = useState(0);
   const [pulseDue, setPulseDue] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fabRef = useRef<HTMLButtonElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
 
   const acknowledged = Boolean(state.privacyAcknowledgedAt);
 
@@ -26,7 +26,7 @@ export function useChat() {
   const closeChat = useCallback(() => {
     setSeenCount(messages.length);
     setOpen(false);
-    fabRef.current?.focus();
+    requestAnimationFrame(() => launcherRef.current?.focus());
   }, [messages.length]);
 
   useEffect(() => {
@@ -36,9 +36,9 @@ export function useChat() {
 
   useEffect(() => {
     if (!open || !acknowledged) return;
-    const id = requestAnimationFrame(() => fabRef.current?.focus());
+    const id = requestAnimationFrame(() => inputRef.current?.focus());
     return () => cancelAnimationFrame(id);
   }, [open, acknowledged]);
 
-  return { ...conversation, open, openChat, closeChat, unread, pulse, inputRef, fabRef };
+  return { ...conversation, open, openChat, closeChat, unread, pulse, inputRef, launcherRef };
 }
