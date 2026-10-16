@@ -1,5 +1,5 @@
 import type { IsoDateTime, LeadAnswers, LeadStatus } from "./lead";
-import { LeadQualification } from "./qualification";
+import type { LeadQualification } from "./qualification";
 
 export type ChatRole = "user" | "assistant" | "system";
 /** Roles accepted from the client. The server adds the system prompt itself. */
@@ -20,7 +20,7 @@ export interface ChatMessage {
 }
 
 /** Demo only. Never sent when agency.isDemo is false. */
-export interface AgentPreview {
+export interface AgentPreviewData {
   reference: string;
   qualification: LeadQualification;
   status: LeadStatus;
@@ -32,7 +32,7 @@ export interface ConversationState {
   leadData: Partial<LeadAnswers>;
   declinedFields: LeadField[];
   leadSaved: boolean;
-  agentPreview?: AgentPreview;
+  agentPreview?: AgentPreviewData;
 }
 
 export interface ChatRequest {
@@ -47,5 +47,5 @@ export interface ChatRequest {
 /** The server's merged view of the lead. The client replaces its own copy with it. */
 export type ChatReply = Pick<ChatRequest, "leadData" | "declinedFields" | "leadSaved"> & {
   message: string;
-  agentPreview?: AgentPreview;
+  agentPreview?: AgentPreviewData;
 };

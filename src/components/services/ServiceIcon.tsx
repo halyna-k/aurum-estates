@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
-import { SERVICE_ICONS } from "@/types/service";
+import type { ServiceIconName } from "@/types/service";
 
-type IconName = (typeof SERVICE_ICONS)[number];
-
-const ICONS: Record<IconName, ReactNode> = {
+const ICONS: Record<ServiceIconName, ReactNode> = {
   home: (
     <>
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -16,7 +14,7 @@ const ICONS: Record<IconName, ReactNode> = {
   message: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />,
 };
 
-export default function ServiceIcon({ name }: { name: IconName }) {
+export default function ServiceIcon({ name }: { name: ServiceIconName }) {
   return (
     <svg
       aria-hidden="true"

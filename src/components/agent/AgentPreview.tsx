@@ -1,11 +1,12 @@
-import { formatGbp } from "@/lib/format";
-import { STATUS_LABELS } from "@/lib/leads/labels";
-import type { AgentPreview as Preview } from "@/types/chat";
+import { formatDate, formatGbp } from "@/lib/format";
+import { EMPLOYMENT_LABELS, PROPERTY_TYPE_LABELS, STATUS_LABELS } from "@/lib/leads/labels";
+import type { AgentPreviewData } from "@/types/chat";
 import type { LeadAnswers } from "@/types/lead";
 import TriageBadge from "./TriageBadge";
+import { bedroomsLabel } from "@/lib/property";
 
 interface AgentPreviewProps {
-  preview: Preview;
+  preview: AgentPreviewData;
   lead: Partial<LeadAnswers>;
 }
 
@@ -18,23 +19,16 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
     ["Name", lead.fullName],
     ["Email", lead.email],
     ["Phone", lead.phone],
-    [
-      "Looking for",
-      lead.bedrooms === undefined
-        ? undefined
-        : lead.bedrooms === 0
-          ? "Studio"
-          : `${lead.bedrooms} bed`,
-    ],
-    ["Property Type", lead.propertyType],
+    ["Property type", lead.propertyType && PROPERTY_TYPE_LABELS[lead.propertyType]],
+    ["Bedrooms", lead.bedrooms === undefined ? undefined : bedroomsLabel(lead.bedrooms)],
     ["Area", lead.area],
     ["Budget", lead.budget === undefined ? undefined : `${formatGbp(lead.budget)} pcm`],
-    ["Move-in", lead.moveInDate],
+    ["Move-in", lead.moveInDate && formatDate(lead.moveInDate)],
+    ["Employment", lead.employmentStatus && EMPLOYMENT_LABELS[lead.employmentStatus]],
     [
       "Income",
       lead.annualIncome === undefined ? undefined : `${formatGbp(lead.annualIncome)} a year`,
     ],
-    ["Employment Status", lead.employmentStatus],
     ["Guarantor", yesNo(lead.hasGuarantor)],
     ["Occupants", lead.occupants?.toString()],
     ["Pets", yesNo(lead.hasPets)],
