@@ -3,14 +3,14 @@ import Container from "@/components/ui/Container";
 import Logo from "@/components/ui/Logo";
 
 const NAV_LINKS = [
-  { href: "#services", label: "Services" },
-  { href: "#properties", label: "Properties" },
-  { href: "#contact", label: "Contact" },
+  { href: "/#services", label: "Services" },
+  { href: "/#properties", label: "Properties" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export default function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-page/80 backdrop-blur focus:z-100">
+    <header className="sticky top-0 z-40 border-b border-line bg-page/80 backdrop-blur">
       <Container className="flex flex-wrap items-center justify-between gap-x-8 py-2">
         <Logo />
 
