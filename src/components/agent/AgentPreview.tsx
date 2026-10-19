@@ -1,9 +1,9 @@
 import { formatDate, formatGbp } from "@/lib/format";
 import { EMPLOYMENT_LABELS, PROPERTY_TYPE_LABELS, STATUS_LABELS } from "@/lib/leads/labels";
+import { bedroomsLabel } from "@/lib/property";
 import type { AgentPreviewData } from "@/types/chat";
 import type { LeadAnswers } from "@/types/lead";
 import TriageBadge from "./TriageBadge";
-import { bedroomsLabel } from "@/lib/property";
 
 interface AgentPreviewProps {
   preview: AgentPreviewData;
