@@ -2,14 +2,14 @@
 
 import { useId } from "react";
 import { useChat } from "@/hooks/useChat";
-import ChatFAB from "./ChatLauncher";
+import ChatLauncher from "./ChatLauncher";
 import ChatPanel from "./ChatPanel";
 import { agency } from "@/agency/config";
 import AgentPreview from "@/components/agent/AgentPreview";
 
 export default function ChatWidget() {
   const chat = useChat();
-  const { fabRef } = chat;
+  const { launcherRef } = chat;
   const panelId = useId();
 
   return (
@@ -31,8 +31,8 @@ export default function ChatWidget() {
       {agency.isDemo && chat.open && chat.state.agentPreview && (
         <AgentPreview preview={chat.state.agentPreview} lead={chat.state.leadData} />
       )}
-      <ChatFAB
-        ref={fabRef}
+      <ChatLauncher
+        ref={launcherRef}
         open={chat.open}
         unread={chat.unread}
         pulse={chat.pulse}
