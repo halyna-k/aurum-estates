@@ -40,7 +40,8 @@ export default function ChatPanel({
     <>
       <button
         type="button"
-        aria-label="Close chat"
+        aria-hidden="true"
+        tabIndex={-1}
         onClick={onClose}
         className="fixed inset-0 z-50 bg-black/60"
       />
@@ -53,9 +54,9 @@ export default function ChatPanel({
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
         }}
-        className="animate-panel-in fixed right-3 bottom-24 z-50 flex h-[min(36rem,calc(100dvh-8rem))] w-[min(23.75rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-panel max-sm:inset-0 max-sm:h-dvh max-sm:w-full max-sm:rounded-none max-sm:border-0 sm:right-7"
+        className="animate-panel-in fixed top-3 right-2 bottom-2 left-2 z-50 flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-panel sm:top-auto sm:right-7 sm:bottom-24 sm:left-auto sm:h-[min(36rem,calc(100dvh-8rem))] sm:w-[min(23.75rem,calc(100vw-1.5rem))] sm:rounded-lg"
       >
-        <ChatHeader onClose={onClose} />
+        <ChatHeader onNewChat={onReset} onClose={onClose} />
         <ChatMessages messages={messages} loading={loading} />
 
         <div role="status">
@@ -72,7 +73,7 @@ export default function ChatPanel({
         )}
 
         {privacyDeclined && (
-          <div className="shrink-0 border-t border-line p-4">
+          <div className="shrink-0 p-4">
             <Button onClick={onReset} variant="secondary" className="w-full">
               Start again
             </Button>
