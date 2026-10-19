@@ -20,7 +20,7 @@ export default function Footer() {
     legal.redressScheme && `Member of ${REDRESS_SCHEMES[legal.redressScheme]}`,
     legal.clientMoneyProtection && `Client money protection: ${legal.clientMoneyProtection}`,
     legal.icoRegistrationNumber && `ICO registration number: ${legal.icoRegistrationNumber}`,
-  ].filter(Boolean);
+  ].filter((line): line is string => Boolean(line));
 
   return (
     <footer id="contact" className="border-t border-line bg-surface">
@@ -56,23 +56,19 @@ export default function Footer() {
 
         <div className="mt-10 flex flex-col gap-4 border-t border-line pt-6 text-xs leading-relaxed text-ink-muted sm:flex-row md:text-sm">
           {isDemo ? (
-            <p className="text-xs">
+            <p>
               {brand.name} is a fictional agency created to demonstrate an AI lettings assistant.
               <br />
               Listings, prices and photos are illustrative.
             </p>
           ) : (
-            legalLines
-              .filter((line): line is string => Boolean(line))
-              .map((line) => <p key={line}>{line}</p>)
+            legalLines.map((line) => <p key={line}>{line}</p>)
           )}
           <div className="space-y-2 sm:ml-auto sm:text-right">
-            <p className="text-xs md:text-sm">
-              &copy; {new Date().getFullYear()} {brand.name}.{" "}
-              <Link
-                href={legal.privacyPolicyUrl}
-                className="ml-3 underline underline-offset-2 hover:text-ink"
-              >
+            <p>
+              &copy; {new Date().getFullYear()} {brand.name}
+              <span className="mx-3">·</span>
+              <Link href={legal.privacyPolicyUrl} className="underline underline-offset-2 hover:text-ink">
                 Privacy notice
               </Link>
             </p>
