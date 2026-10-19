@@ -3,7 +3,7 @@ import { agency } from "@/agency/config";
 import Container from "@/components/ui/Container";
 import Logo from "@/components/ui/Logo";
 
-const VENDOR = "GK";
+const DEVELOPER = "GK";
 
 const REDRESS_SCHEMES = {
   TPO: "The Property Ombudsman",
@@ -76,7 +76,7 @@ export default function Footer() {
                 Privacy notice
               </Link>
             </p>
-            <p>AI system & website developed by {VENDOR}.Concept project.</p>
+            <p>Developed by {DEVELOPER}.</p>
           </div>
         </div>
       </Container>
