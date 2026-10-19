@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/format";
 import type { IsoDate } from "@/types/lead";
 import type { Furnishing } from "@/types/property";
 
@@ -20,15 +21,5 @@ export function bedroomsLabel(bedrooms: number): string {
 }
 
 export function availabilityLabel(availableFrom: IsoDate, today = new Date()): string {
-  const date = new Date(availableFrom);
-  if (date <= today) return "Now";
-
-  const formatted = new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-
-  return formatted;
+  return new Date(availableFrom) <= today ? "Now" : formatDate(availableFrom);
 }
