@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-
 import { agency } from "@/agency/config";
 import { bodyFont, displayFont } from "@/agency/fonts";
 import ChatWidget from "@/components/chat/ChatWidget";
