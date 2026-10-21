@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 type Variant = "primary" | "secondary";
 
 const BASE =
-  "inline-flex min-h-11 items-center justify-center rounded-md border px-6 text-xs font-medium tracking-[0.2em] uppercase transition-colors";
+  "inline-flex min-h-11 items-center justify-center rounded-md border px-6 text-xs font-medium tracking-label whitespace-nowrap uppercase transition-colors";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "border-brand bg-brand text-on-brand hover:border-brand-hover hover:bg-brand-hover",

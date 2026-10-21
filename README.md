@@ -28,7 +28,7 @@ npm run dev
 | `RESEND_API_KEY`               | Resend API key for lead emails                              |
 | `RESEND_FROM_EMAIL`            | Sender address of system emails (domain verified in Resend) |
 | `LEAD_NOTIFY_EMAIL`            | Address(es) that receive new leads, comma-separated         |
-| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Service account the sheet and calendar are shared with     |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Service account the sheet and calendar are shared with      |
 | `GOOGLE_PRIVATE_KEY`           | Private key of that service account                         |
 | `GOOGLE_SHEETS_ID`             | ID of the leads spreadsheet                                 |
 | `GOOGLE_CALENDAR_ID`           | Calendar used for viewings                                  |

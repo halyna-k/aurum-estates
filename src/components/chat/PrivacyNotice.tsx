@@ -12,7 +12,7 @@ export default function PrivacyNotice({ onAccept, onDecline }: PrivacyNoticeProp
   const months = `${retentionMonths} ${retentionMonths === 1 ? "month" : "months"}`;
 
   return (
-    <div className="shrink-0 border-t border-line bg-surface-2 p-4">
+    <div className="mx-4 mb-2 rounded-lg bg-surface-2 p-4">
       <h3 className="text-sm font-medium text-ink">Before we start</h3>
 
       <p className="mt-3 text-xs leading-relaxed text-ink-secondary">
@@ -46,7 +46,7 @@ export default function PrivacyNotice({ onAccept, onDecline }: PrivacyNoticeProp
         <Button onClick={onAccept} autoFocus className="flex-1">
           Continue
         </Button>
-        <Button onClick={onDecline} variant="secondary">
+        <Button onClick={onDecline} variant="secondary" className="shrink-0">
           No thanks
         </Button>
       </div>
