@@ -9,12 +9,12 @@ export default function PropertiesList() {
     <section
       id="properties"
       aria-labelledby="properties-title"
-      className="relative bg-page py-16 md:py-30"
+      className="relative bg-page py-8 md:py-12"
     >
       <Container>
         <SectionHeader id="properties-title" {...agency.sections.properties} />
 
-        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,18rem),1fr))] gap-6">
+        <ul className="grid gap-6 md:grid-cols-3">
           {PROPERTIES.map((property, index) => (
             <PropertyCard key={property.id} property={property} index={index} />
           ))}

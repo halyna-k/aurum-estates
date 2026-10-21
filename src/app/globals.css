@@ -55,9 +55,13 @@
 
 @layer base {
   html {
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 4rem;
+    scrollbar-gutter: stable;
     scrollbar-width: thin;
     scrollbar-color: var(--border) var(--bg);
+  }
+  html:has(dialog[open]) {
+    overflow: hidden;
   }
 
   @media (prefers-reduced-motion: no-preference) {

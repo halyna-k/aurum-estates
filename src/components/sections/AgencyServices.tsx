@@ -9,12 +9,12 @@ export default function AgencyServices() {
     <section
       id="services"
       aria-labelledby="services-title"
-      className="relative bg-page py-16 md:py-30"
+      className="relative bg-page py-8 md:py-12"
     >
       <Container>
         <SectionHeader id="services-title" {...agency.sections.services} />
 
-        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-px border border-line bg-line">
+        <ul className="grid gap-6 md:grid-cols-[repeat(auto-fit,minmax(13rem,1fr))]">
           {SERVICES.map((service, index) => (
             <ServiceCard key={service.id} service={service} index={index} />
           ))}

@@ -33,7 +33,7 @@ export default function NavMenu({ links }: NavMenuProps) {
         aria-expanded={open}
         aria-controls={menuId}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="-mr-3 grid size-11 place-items-center rounded-md text-brand transition-colors hover:text-brand-hover md:hidden"
+        className="-mr-3 grid size-11 place-items-center text-brand transition-colors hover:text-brand-hover md:hidden"
       >
         <svg
           aria-hidden="true"

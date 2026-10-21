@@ -6,7 +6,7 @@ export default function Hero() {
   const { eyebrow, headline, subtitle, intro, facts } = agency.hero;
 
   return (
-    <section className="relative isolate flex min-h-[95dvh] items-center overflow-hidden bg-page bg-hero-glow py-12 md:py-24">
+    <section className="relative isolate flex min-h-[95dvh] items-center overflow-hidden bg-page bg-hero-glow py-8 md:py-16">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-grid-lines opacity-25"
