@@ -41,6 +41,7 @@ export interface AgencyConfig {
   chat: {
     assistantName: string;
     greeting: string;
+    description: string;
     humanContact: { phone: string; email: string; hours: string };
   };
   // Secrets (sheet ID, credentials, email API key) live in environment variables, not here.
