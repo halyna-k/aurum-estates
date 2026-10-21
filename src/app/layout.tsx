@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+
 
 import { agency } from "@/agency/config";
 import { bodyFont, displayFont } from "@/agency/fonts";
@@ -15,6 +16,14 @@ export const metadata: Metadata = {
   description: agency.brand.description,
   // A fictional agency must not appear in search results.
   ...(agency.isDemo && { robots: { index: false, follow: false } }),
+};
+
+export const viewport: Viewport = {
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: agency.brand.themeColor.light },
+    { media: "(prefers-color-scheme: dark)", color: agency.brand.themeColor.dark },
+  ],
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

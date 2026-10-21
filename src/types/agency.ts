@@ -22,6 +22,7 @@ export interface AgencyConfig {
     logoSrc?: string;
     description: string;
     tagline: string;
+    themeColor: { light: string; dark: string };
   };
   hero: {
     eyebrow: string;

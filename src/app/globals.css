@@ -17,11 +17,22 @@
   --color-brand: var(--gold);
   --color-brand-hover: var(--gold-hover);
   --color-on-brand: var(--on-gold);
+  --color-line-strong: var(--border-strong);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--error);
 
   --shadow-panel: var(--shadow);
+}
+
+@theme {
+  --tracking-label: 0.2em;
+  --tracking-eyebrow: 0.32em;
+  --text-display: clamp(3rem, 8.5vw, 6.25rem);
+  --text-display--line-height: 1.04;
+  --text-heading: clamp(2.125rem, 5vw, 3.5rem);
+  --text-heading--line-height: 1.1;
+  --text-lead: clamp(1.0625rem, 2.2vw, 1.5rem);
 }
 
 @utility bg-hero-glow {

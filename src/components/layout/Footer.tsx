@@ -68,11 +68,14 @@ export default function Footer() {
             <p>
               &copy; {new Date().getFullYear()} {brand.name}
               <span className="mx-3">·</span>
-              <Link href={legal.privacyPolicyUrl} className="underline underline-offset-2 hover:text-ink">
+              <Link
+                href={legal.privacyPolicyUrl}
+                className="underline underline-offset-2 hover:text-ink"
+              >
                 Privacy notice
               </Link>
             </p>
-            <p>Developed by {DEVELOPER}.</p>
+            <p>Developed by {DEVELOPER}</p>
           </div>
         </div>
       </Container>

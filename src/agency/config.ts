@@ -9,6 +9,7 @@ export const agency: AgencyConfig = {
     name: "Aurum Estates",
     description: `Flats to rent across London. Ask ${assistantName}, our AI assistant, a question or leave your details for an agent to follow up.`,
     tagline: "Flats to rent across London.",
+    themeColor: { light: "#fbfaf7", dark: "#0b0b0a" }
   },
   hero: {
     eyebrow: "Lettings across London",
