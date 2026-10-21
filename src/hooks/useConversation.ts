@@ -41,6 +41,10 @@ export function useConversation() {
 
   useEffect(() => () => controllerRef.current?.abort(), []);
 
+  const setProperty = useCallback((propertyId: string) => {
+    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, propertyId } }));
+  }, []);
+
   const addMessage = useCallback((role: UIMessage["role"], text: string, isError = false) => {
     setMessages((prev) => [
       ...prev,
@@ -115,6 +119,7 @@ export function useConversation() {
     messages,
     state,
     loading,
+    setProperty,
     send,
     acknowledgePrivacyNotice,
     declinePrivacyNotice,

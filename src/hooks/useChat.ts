@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { onChatRequest } from "@/lib/chat/events";
 import { useConversation } from "./useConversation";
 
 const PULSE_DELAY_MS = 8000;
@@ -8,6 +9,7 @@ const PULSE_DELAY_MS = 8000;
 export function useChat() {
   const conversation = useConversation();
   const { messages, state } = conversation;
+  const { setProperty } = conversation;
 
   const [open, setOpen] = useState(false);
   const [seenCount, setSeenCount] = useState(0);
@@ -28,6 +30,15 @@ export function useChat() {
     setOpen(false);
     requestAnimationFrame(() => launcherRef.current?.focus());
   }, [messages.length]);
+
+  useEffect(
+    () =>
+      onChatRequest((propertyId) => {
+        if (propertyId) setProperty(propertyId);
+        setOpen(true);
+      }),
+    [setProperty],
+  );
 
   useEffect(() => {
     const id = setTimeout(() => setPulseDue(true), PULSE_DELAY_MS);
