@@ -15,8 +15,19 @@ export function formatGbp(amount: number): string {
 export function formatDate(iso: IsoDate): string {
   return new Intl.DateTimeFormat("en-GB", {
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(iso));
+}
+
+export function formatDateShort(iso: IsoDate, today = new Date()): string {
+  const date = new Date(iso);
+  const sameYear = date.getUTCFullYear() === today.getUTCFullYear();
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "numeric",
+    year: sameYear ? undefined : "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }

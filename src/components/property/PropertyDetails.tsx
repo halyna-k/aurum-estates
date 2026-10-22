@@ -45,9 +45,9 @@ export default function PropertyDetails({ property }: { property: Property }) {
         ref={dialogRef}
         aria-labelledby={titleId}
         onClick={(e) => e.target === dialogRef.current && close()}
-        className="animate-sheet-in m-0 mt-auto max-h-[90dvh] w-full max-w-none overflow-y-auto rounded-t-2xl border border-line bg-surface text-ink backdrop:bg-black/70 md:m-auto md:max-w-lg md:rounded-2xl"
+        className="animate-sheet-in m-0 mt-auto max-h-[90dvh] w-full max-w-none overflow-y-auto overscroll-contain rounded-t-2xl border border-line bg-surface text-ink backdrop:bg-black/70 md:m-auto md:max-w-lg md:rounded-2xl"
       >
-        <div className="relative aspect-video">
+        <div className="relative h-48 md:aspect-video md:h-auto">
           <Image
             src={image.src}
             alt={image.alt}
@@ -59,7 +59,7 @@ export default function PropertyDetails({ property }: { property: Property }) {
             type="button"
             onClick={close}
             aria-label="Close details"
-            className="absolute top-4 right-4 grid size-11 place-items-center rounded-full bg-brand/30 text-white backdrop-blur transition-colors hover:bg-brand/70"
+            className="absolute top-3 right-3 grid size-11 place-items-center rounded-full bg-brand/50 text-white backdrop-blur transition-colors hover:bg-brand/70"
           >
             <svg
               aria-hidden="true"
@@ -75,25 +75,25 @@ export default function PropertyDetails({ property }: { property: Property }) {
           </button>
         </div>
 
-        <div className="relative p-6">
+        <div className="p-4 md:p-6">
           <p className="font-serif text-xs tracking-label text-ink-muted uppercase">{area}</p>
-          <h2 id={titleId} className="mt-1 font-serif text-2xl">
+          <h2 id={titleId} className="mt-1 font-serif text-xl md:text-2xl">
             {address}
           </h2>
-          <p className="mt-2 font-serif text-3xl text-brand">
+          <p className="mt-2 font-serif text-2xl text-brand md:text-3xl">
             {formatGbp(rentPcm)}
             <span className="ml-1 font-sans text-sm text-ink-muted">pcm</span>
           </p>
 
-          <ul className="mt-4 flex flex-wrap gap-2">
+          <ul className="mt-3 flex flex-wrap gap-2 md:mt-4">
             {facts.map((fact) => (
-              <li key={fact} className="rounded-md border border-line px-3 py-2 text-sm">
+              <li key={fact} className="rounded-lg border border-line px-3 py-2 text-sm">
                 {fact}
               </li>
             ))}
           </ul>
 
-          <dl className="mt-6 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-6">
+          <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line pt-4 md:mt-6 md:gap-y-4 md:pt-6">
             {rows.map(([label, value]) => (
               <div key={label}>
                 <dt className="text-xs text-ink-muted">{label}</dt>
@@ -102,7 +102,7 @@ export default function PropertyDetails({ property }: { property: Property }) {
             ))}
           </dl>
 
-          <div className="sticky bottom-0 flex justify-end border-t border-line bg-surface p-4">
+          <div className="mt-4 flex justify-end md:mt-6">
             <Button
               size="sm"
               onClick={() => {

@@ -14,7 +14,7 @@ export default function PropertiesList() {
       <Container>
         <SectionHeader id="properties-title" {...agency.sections.properties} />
 
-        <ul className="grid gap-6 md:grid-cols-3">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {PROPERTIES.map((property, index) => (
             <PropertyCard key={property.id} property={property} index={index} />
           ))}

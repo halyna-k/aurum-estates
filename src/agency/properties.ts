@@ -19,7 +19,7 @@ export const PROPERTIES: Property[] = [
     address: "14 Brook Street, Mayfair, W1K",
     rentPcm: 6500,
     deposit: 7500,
-    availableFrom: inDays(30),
+    availableFrom: inDays(0),
     furnishing: "part_furnished",
     councilTaxBand: "G",
     epcRating: "C",

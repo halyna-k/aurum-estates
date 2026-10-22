@@ -1,4 +1,4 @@
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateShort } from "@/lib/format";
 import type { IsoDate } from "@/types/lead";
 import type { Furnishing } from "@/types/property";
 
@@ -20,6 +20,10 @@ export function bedroomsLabel(bedrooms: number): string {
   return `${bedrooms} ${bedrooms === 1 ? "bed" : "beds"}`;
 }
 
-export function availabilityLabel(availableFrom: IsoDate, today = new Date()): string {
-  return new Date(availableFrom) <= today ? "Now" : formatDate(availableFrom);
+export function availabilityLabel(
+  availableFrom: IsoDate,
+  { short = false, today = new Date() } = {},
+): string {
+  if (new Date(availableFrom) <= today) return "Now";
+  return short ? `${formatDateShort(availableFrom, today)}` : formatDate(availableFrom);
 }

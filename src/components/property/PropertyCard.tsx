@@ -17,9 +17,7 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
     bedroomsLabel(bedrooms),
     `${bathrooms} ${bathrooms === 1 ? "bath" : "baths"}`,
     floorAreaSqFt && `${floorAreaSqFt.toLocaleString("en-GB")} sq ft`,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  ].filter((spec): spec is string => Boolean(spec));
 
   return (
     <li>
@@ -38,22 +36,33 @@ export default function PropertyCard({ property, index }: PropertyCardProps) {
               className="absolute inset-0 bg-linear-to-b from-black/5 to-black/60"
             />
             <span className="absolute top-4 left-4 rounded-lg bg-brand px-3 py-2 text-xs font-semibold tracking-label text-on-brand uppercase">
-              {availabilityLabel(property.availableFrom)}
+              {availabilityLabel(property.availableFrom, { short: true })}
             </span>
             <span className="absolute bottom-4 left-4 font-serif text-xs tracking-label text-white uppercase">
               {area}
             </span>
           </div>
 
-          <div className="flex flex-1 flex-col gap-1 p-6">
+          <div className="flex flex-1 flex-col gap-1 p-6 pb-2">
             <p className="font-serif text-2xl text-brand">
               {formatGbp(rentPcm)}
               <span className="ml-1 font-sans text-xs text-ink-muted">pcm</span>
             </p>
 
-            <h3 className="line-clamp-2 min-h-10 text-sm text-ink-secondary">{address}</h3>
+            <h3 className="line-clamp-2 text-sm text-ink-secondary">{address}</h3>
 
-            <p className="mb-4 text-sm text-ink">{specs}</p>
+            <ul className="mb-2 flex flex-wrap gap-x-2 text-sm text-ink">
+              {specs.map((spec, index) => (
+                <li key={spec} className="whitespace-nowrap">
+                  {index > 0 && (
+                    <span aria-hidden="true" className="mr-2 text-ink-muted">
+                      ·
+                    </span>
+                  )}
+                  {spec}
+                </li>
+              ))}
+            </ul>
 
             <div className="mt-auto border-t border-line">
               <PropertyDetails property={property} />
