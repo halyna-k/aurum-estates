@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, type Ref } from "react";
+import { useState, type ReactNode, type Ref } from "react";
 import { MAX_MESSAGE_LENGTH } from "@/lib/chat/limits";
 
 interface ChatInputProps {
   ref?: Ref<HTMLInputElement>;
   busy: boolean;
   onSend: (text: string) => void;
+  /** Extra buttons before Send, e.g. voice input later. */
+  actions?: ReactNode;
 }
 
-export default function ChatInput({ ref, busy, onSend }: ChatInputProps) {
+export default function ChatInput({ ref, busy, onSend, actions }: ChatInputProps) {
   const [value, setValue] = useState("");
   const canSend = value.trim().length > 0 && !busy;
 
@@ -21,7 +23,7 @@ export default function ChatInput({ ref, busy, onSend }: ChatInputProps) {
         onSend(value);
         setValue("");
       }}
-      className="flex shrink-0 gap-3 border-t border-line bg-surface-3 p-3"
+      className="mx-4 mt-2 flex shrink-0 items-center gap-1 rounded-xl border border-line-strong bg-surface-2 py-1 pr-1 pl-4 focus-within:border-brand focus-within:ring-1 focus-within:ring-brand"
     >
       <input
         ref={ref}
@@ -30,15 +32,15 @@ export default function ChatInput({ ref, busy, onSend }: ChatInputProps) {
         maxLength={MAX_MESSAGE_LENGTH}
         autoComplete="off"
         aria-label="Your message"
-        placeholder="Type your message"
-        className="min-w-0 flex-1 rounded-md border border-line bg-surface-2 px-3 py-2.5 text-base text-ink placeholder:text-ink-muted"
+        placeholder="Type here ..."
+        className="min-w-0 flex-1 bg-transparent py-2 text-base text-ink placeholder:text-ink-muted focus:outline-none"
       />
-
+      {actions}
       <button
         type="submit"
         disabled={!canSend}
         aria-label="Send message"
-        className="grid size-11 shrink-0 place-items-center rounded-md bg-brand text-on-brand transition-colors hover:bg-brand-hover disabled:opacity-40"
+        className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand text-on-brand transition-colors hover:bg-brand-hover disabled:opacity-40"
       >
         <svg
           aria-hidden="true"
