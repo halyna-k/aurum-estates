@@ -38,7 +38,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
   return (
     <aside
       aria-label="Demo: what the agent receives"
-      className="fixed right-[27rem] bottom-24 z-50 hidden w-72 rounded-lg border border-line bg-surface p-4 shadow-panel lg:block"
+      className="fixed right-[27rem] bottom-24 z-50 hidden w-72 rounded-xl border border-line bg-surface p-4 shadow-panel lg:block"
     >
       <p className="text-xs text-ink-muted">
         Demo only. This is what the agent receives in the lead sheet. Applicants never see this

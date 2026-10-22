@@ -28,7 +28,7 @@ export default function ChatLauncher({
       aria-expanded={open}
       aria-controls={panelId}
       aria-label={`Chat with ${assistantName}, our AI assistant`}
-      className={`group fixed right-3 bottom-7 z-50 grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover sm:right-7 ${open ? "max-sm:hidden" : ""} ${
+      className={`group fixed right-3 bottom-5 z-50 grid size-14 place-items-center rounded-full bg-brand text-on-brand shadow-panel transition-colors hover:bg-brand-hover md:right-7 md:bottom-7 ${open ? "max-sm:hidden" : ""} ${
         pulse ? "animate-fab-pulse" : ""
       }`}
     >
@@ -59,7 +59,7 @@ export default function ChatLauncher({
       {!open && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 rounded-md border border-line bg-surface-3 px-4 py-2 text-xs font-medium whitespace-nowrap text-ink opacity-0 shadow-panel transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+          className="pointer-events-none absolute top-1/2 right-full mr-3 -translate-y-1/2 rounded-lg border border-line bg-surface-3 px-4 py-2 text-xs font-medium whitespace-nowrap text-ink opacity-0 shadow-panel transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
         >
           Chat with {assistantName}
         </span>
