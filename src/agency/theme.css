@@ -1,0 +1,54 @@
+:root {
+  /* Brand accent: the only block to edit when the gold changes */
+  --gold: #c9a84c;
+  --gold-hover: #e8c97a;
+  --on-gold: #0b0b0a;
+
+  /* Background */
+  --bg: #0b0b0a;
+  --bg-2: #131312;
+  --bg-3: #1b1b19;
+  --bg-4: #252522;
+
+  /* Text */
+  --text-primary: #f5f1e6;
+  --text-secondary: #d0c7b1;
+  --text-muted: #a99e86;
+
+  /* Lines */
+  --border: color-mix(in srgb, var(--gold) 28%, transparent);
+  --border-strong: color-mix(in srgb, var(--gold) 60%, var(--bg-3));
+
+  --shadow: 0 12px 48px rgba(0, 0, 0, 0.65);
+
+  /* State */
+  --success: #5cb860;
+  --warning: #e8a84c;
+  --error: #ef6b6b;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --gold: #8a6216;
+    --gold-hover: #6f4e10;
+    --on-gold: #ffffff;
+
+    --bg: #fbfaf7;
+    --bg-2: #ffffff;
+    --bg-3: #f6f2ea;
+    --bg-4: #ede7db;
+
+    --text-primary: #1b1710;
+    --text-secondary: #4d4333;
+    --text-muted: #675c47;
+
+    --border: color-mix(in srgb, var(--gold) 22%, transparent);
+    --border-strong: #857a62;
+
+    --shadow: 0 12px 48px rgba(0, 0, 0, 0.1);
+
+    --success: #2a7330;
+    --warning: #8a5a00;
+    --error: #b3261e;
+  }
+}

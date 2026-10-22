@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=20.9"
   },
   "dependencies": {
     "googleapis": "^173.0.0",
@@ -26,6 +31,8 @@
     "eslint": "^9.34.0",
     "eslint-config-next": "^16.2.6",
     "postcss": "^8.5.6",
+    "prettier": "^3.9.10",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2"
   },

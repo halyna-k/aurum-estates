@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aurum Estates
 
-## Getting Started
+A website template for a UK lettings agency, with an AI assistant that answers general renting
+questions and collects enquiries for a human agent. The demo agency, Aurum Estates, is fictional.
 
-First, run the development server:
+## Status
+
+Chat, lead triage and the website are working. Lead storage in Google Sheets, email notifications and viewing bookings are not connected yet.
+
+## Stack
+
+Next.js, React, TypeScript, Tailwind CSS, Groq, Google Sheets and Calendar, Resend.
+
+## Getting started
 
 ```bash
+npm ci
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Name                           | Purpose                                                     |
+| ------------------------------ | ----------------------------------------------------------- |
+| `GROQ_API_KEY`                 | Groq API key for the assistant                              |
+| `SITE_URL`                     | Public site URL, used for metadata                          |
+| `RESEND_API_KEY`               | Resend API key for lead emails                              |
+| `RESEND_FROM_EMAIL`            | Sender address of system emails (domain verified in Resend) |
+| `LEAD_NOTIFY_EMAIL`            | Address(es) that receive new leads, comma-separated         |
+| `GOOGLE_SERVICE_ACCOUNT_EMAIL` | Service account the sheet and calendar are shared with      |
+| `GOOGLE_PRIVATE_KEY`           | Private key of that service account                         |
+| `GOOGLE_SHEETS_ID`             | ID of the leads spreadsheet                                 |
+| `GOOGLE_CALENDAR_ID`           | Calendar used for viewings                                  |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Share the sheet and the calendar with the service account email.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+`dev`, `build`, `start`, `lint`, `typecheck`, `format`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/agency/` – everything specific to one agency: details, properties, services, fonts, theme
+- `src/app/` – pages and API routes
+- `src/components/` – UI, sections, chat
+- `src/lib/chat/` – prompt, validation and limits for the assistant
+- `src/lib/leads/` – lead building, triage, storage and notifications
+- `src/types/` – shared types
 
-## Deploy on Vercel
+## Adding a new agency
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Clone the repository and change only `src/agency/*`, `public/images/*` and `.env.local`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Image credits
+
+Property photos: Unsplash (photographer names and links to be added).
+
+## Notes
+
+The demo is fictional. The assistant gives general information only, not legal advice.

@@ -1,73 +1,96 @@
-import { useChat } from "@/hooks/useChat";
+import type { RefObject } from "react";
+import { agency } from "@/agency/config";
+import type { ConversationState, UIMessage } from "@/types/chat";
+import ChatHeader from "./ChatHeader";
+import ChatInput from "./ChatInput";
+import ChatMessages from "./ChatMessages";
+import ChatFooter from "./ChatFooter";
+import PrivacyNotice from "./PrivacyNotice";
+import NotificationBar from "./NotificationBar";
+import Button from "@/components/ui/Button";
 
-import { ChatHeader, GdprBanner, ChatMessages, ChatInput, NotificationBar, ChatFooter } from "@/components";
+interface ChatPanelProps {
+  id: string;
+  messages: UIMessage[];
+  state: ConversationState;
+  loading: boolean;
+  inputRef: RefObject<HTMLInputElement | null>;
+  onSend: (text: string) => void;
+  onAcknowledge: () => void;
+  onDecline: () => void;
+  onReset: () => void;
+  onClose: () => void;
+}
 
 export default function ChatPanel({
+  id,
+  messages,
   state,
   loading,
-  open,
-  setOpen,
-  messages,
-  handleGdprAccept,
-  handleGdprDecline,
   inputRef,
-  input,
-  setInput,
-  send,
-}: ReturnType<typeof useChat>) {
+  onSend,
+  onAcknowledge,
+  onDecline,
+  onReset,
+  onClose,
+}: ChatPanelProps) {
+  const { privacyAcknowledgedAt, privacyDeclined, leadSaved } = state;
+  const { assistantName, humanContact } = agency.chat;
+
+  const hasConsent = Boolean(privacyAcknowledgedAt);
+  const showPrivacyNotice = !hasConsent && !privacyDeclined;
+  const showChatInput = hasConsent && !privacyDeclined;
+  const showStartAgain = privacyDeclined;
+  const showPrivacyFooter = hasConsent || privacyDeclined;
+
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="AI Rental Assistant"
-      className={`
-        fixed bottom-24 right-7 z-(--z-modal)
-        flex
-        h-auto max-h-[75vh]
-        w-95
-        flex-col
-        overflow-hidden
-        rounded-lg
-        border border-(--border)
-        bg-(--bg-2)
-        shadow-custom
-        origin-bottom-right
-        transition-[opacity,transform]
-        duration-220
-        ease-out
+    <>
+      <button
+        type="button"
+        aria-hidden="true"
+        tabIndex={-1}
+        aria-label="Close chat"
+        onClick={onClose}
+        className="fixed inset-0 z-50 cursor-default bg-black/60"
+      />
 
-        ${
-          open
-            ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
-            : "pointer-events-none translate-y-3.5 scale-[0.97] opacity-0"
-        }
+      <div
+        id={id}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Chat with ${assistantName}`}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") onClose();
+        }}
+        className="animate-panel-in fixed inset-x-2 top-3 bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-panel md:inset-x-auto md:top-auto md:right-7 md:bottom-24 md:h-144 md:max-h-[calc(100dvh-8rem)] md:w-96"
+      >
+        <ChatHeader onNewChat={onReset} onClose={onClose} />
 
-        max-sm:bottom-20
-        max-sm:right-2.5
-        max-sm:w-[calc(100vw-20px)]
-        max-sm:max-h-[75vh]
-      `}
-    >
-      {/* Header */}
-      <ChatHeader state={state} loading={loading} setOpen={setOpen} />
+        <ChatMessages messages={messages} loading={loading} />
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col overflow-hidden">
-        {/* GDPR */}
-        {!state.gdprConsented && <GdprBanner onAccept={handleGdprAccept} onDecline={handleGdprDecline} />}
+        {leadSaved && (
+          <div role="status">
+            <NotificationBar tone="success">
+              Your details have been sent to the team. An agent will reply during working hours (
+              {humanContact.hours}).
+            </NotificationBar>
+          </div>
+        )}
 
-        {/* Messages */}
-        <ChatMessages state={state} messages={messages} loading={loading} />
+        {showPrivacyNotice && <PrivacyNotice onAccept={onAcknowledge} onDecline={onDecline} />}
 
-        {/* Input */}
-        {state.gdprConsented && <ChatInput ref={inputRef} input={input} setInput={setInput} loading={loading} send={send} />}
+        {showStartAgain && (
+          <div className="mx-4 mb-2 shrink-0">
+            <Button onClick={onReset} variant="secondary" className="w-full">
+              Start again
+            </Button>
+          </div>
+        )}
 
-        {/* Lead saved */}
-        {state.leadSaved && <NotificationBar text="Your details have been saved. An agent will be in touch shortly." />}
+        {showChatInput && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
+
+        <ChatFooter showPrivacy={showPrivacyFooter} />
       </div>
-
-      {/* Footer */}
-      <ChatFooter />
-    </div>
+    </>
   );
 }
