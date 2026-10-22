@@ -11,9 +11,9 @@ interface ChatMessagesProps {
 }
 
 function bubbleClass(message: UIMessage): string {
-  if (message.role === "user") return "self-end rounded-br-sm bg-brand text-on-brand";
+  if (message.role === "user") return "self-end rounded-xl rounded-br-sm bg-brand text-on-brand";
   const border = message.isError ? "border-danger" : "border-line";
-  return `self-start rounded-bl-sm border bg-surface-2 text-ink ${border}`;
+  return `self-start rounded-xl rounded-bl-sm border bg-surface-2 text-ink ${border}`;
 }
 
 export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
@@ -22,7 +22,8 @@ export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
 
   useEffect(() => {
     const list = listRef.current;
-    if (list) list.scrollTop = list.scrollHeight;
+    if (!list) return;
+    list.scrollTop = messages.length > 1 || loading ? list.scrollHeight : 0;
   }, [messages, loading]);
 
   return (
@@ -31,12 +32,12 @@ export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
       role="log"
       aria-label="Conversation"
       tabIndex={0}
-      className="flex min-h-0 flex-1 [scrollbar-width:thin] flex-col gap-3 overflow-y-auto p-4 motion-safe:scroll-smooth"
+      className="flex min-h-0 flex-1 [scrollbar-width:thin] flex-col gap-4 overflow-y-auto [mask-image:linear-gradient(to_bottom,transparent,#000_1rem)] px-4 pt-4 pb-2 motion-safe:scroll-smooth"
     >
       {messages.map((message) => (
         <div
           key={message.id}
-          className={`animate-message-in max-w-[85%] rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${bubbleClass(message)}`}
+          className={`animate-message-in max-w-[85%] px-4 py-3 text-sm leading-relaxed ${bubbleClass(message)}`}
         >
           <p className="[overflow-wrap:anywhere] whitespace-pre-wrap">
             <span className="sr-only">
@@ -54,7 +55,7 @@ export default function ChatMessages({ messages, loading }: ChatMessagesProps) {
       ))}
 
       {loading && (
-        <div className="self-start rounded-lg rounded-bl-sm border border-line bg-surface-2 px-3.5 py-3">
+        <div className="self-start rounded-xl rounded-bl-sm border border-line bg-surface-2 px-4 py-3">
           <span className="sr-only">{assistantName} is typing</span>
           <div aria-hidden="true" className="flex gap-1">
             <span className="animate-typing-dot size-1.5 rounded-full bg-brand" />
