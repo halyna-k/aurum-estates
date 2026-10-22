@@ -35,6 +35,13 @@ export default function ChatPanel({
   onClose,
 }: ChatPanelProps) {
   const { privacyAcknowledgedAt, privacyDeclined, leadSaved } = state;
+  const { assistantName, humanContact } = agency.chat;
+
+  const hasConsent = Boolean(privacyAcknowledgedAt);
+  const showPrivacyNotice = !hasConsent && !privacyDeclined;
+  const showChatInput = hasConsent && !privacyDeclined;
+  const showStartAgain = privacyDeclined;
+  const showPrivacyFooter = hasConsent || privacyDeclined;
 
   return (
     <>
@@ -42,47 +49,47 @@ export default function ChatPanel({
         type="button"
         aria-hidden="true"
         tabIndex={-1}
+        aria-label="Close chat"
         onClick={onClose}
-        className="fixed inset-0 z-50 bg-black/60"
+        className="fixed inset-0 z-50 cursor-default bg-black/60"
       />
 
       <div
         id={id}
         role="dialog"
         aria-modal="true"
-        aria-label={`Chat with ${agency.chat.assistantName}`}
+        aria-label={`Chat with ${assistantName}`}
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
         }}
-        className="animate-panel-in fixed top-3 right-2 bottom-2 left-2 z-50 flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-panel sm:top-auto sm:right-7 sm:bottom-24 sm:left-auto sm:h-[min(36rem,calc(100dvh-8rem))] sm:w-[min(23.75rem,calc(100vw-1.5rem))] sm:rounded-lg"
+        className="animate-panel-in fixed inset-x-2 top-3 bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border border-line bg-surface shadow-panel md:inset-x-auto md:top-auto md:right-7 md:bottom-24 md:h-144 md:max-h-[calc(100dvh-8rem)] md:w-96"
       >
         <ChatHeader onNewChat={onReset} onClose={onClose} />
+
         <ChatMessages messages={messages} loading={loading} />
 
-        <div role="status">
-          {leadSaved && (
+        {leadSaved && (
+          <div role="status">
             <NotificationBar tone="success">
               Your details have been sent to the team. An agent will reply during working hours (
-              {agency.chat.humanContact.hours}).
+              {humanContact.hours}).
             </NotificationBar>
-          )}
-        </div>
-
-        {!privacyAcknowledgedAt && !privacyDeclined && (
-          <PrivacyNotice onAccept={onAcknowledge} onDecline={onDecline} />
+          </div>
         )}
 
-        {privacyDeclined && (
-          <div className="shrink-0 p-4">
+        {showPrivacyNotice && <PrivacyNotice onAccept={onAcknowledge} onDecline={onDecline} />}
+
+        {showStartAgain && (
+          <div className="mx-4 mb-2 shrink-0">
             <Button onClick={onReset} variant="secondary" className="w-full">
               Start again
             </Button>
           </div>
         )}
 
-        {privacyAcknowledgedAt && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
+        {showChatInput && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
 
-        <ChatFooter />
+        <ChatFooter showPrivacy={showPrivacyFooter} />
       </div>
     </>
   );
