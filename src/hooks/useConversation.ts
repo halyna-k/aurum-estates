@@ -32,7 +32,7 @@ function toHistory(messages: UIMessage[]): ChatMessage[] {
 }
 
 export function useConversation() {
-  const [messages, setMessages] = useState<UIMessage[]>(() => [createGreeting()]);
+  const [messages, setMessages] = useState<UIMessage[]>([]);
   const [state, setState] = useState<ConversationState>(initialState);
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState(() => crypto.randomUUID());
@@ -53,17 +53,32 @@ export function useConversation() {
   }, []);
 
   const acknowledgePrivacyNotice = useCallback(() => {
-    setState((prev) => ({ ...prev, privacyAcknowledgedAt: new Date().toISOString() }));
+    setState((prev) => ({
+      ...prev,
+      privacyAcknowledgedAt: new Date().toISOString(),
+      privacyDeclined: false,
+    }));
+
+    setMessages([createGreeting()]);
   }, []);
 
   const declinePrivacyNotice = useCallback(() => {
     const { phone, email, hours } = agency.chat.humanContact;
-    setState((prev) => ({ ...prev, privacyDeclined: true }));
-    addMessage(
-      "assistant",
-      `No problem, nothing has been collected. You can reach the team on ${phone} or at ${email} (${hours}).`,
-    );
-  }, [addMessage]);
+
+    setState((prev) => ({
+      ...prev,
+      privacyDeclined: true,
+    }));
+
+    setMessages([
+      {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        text: `No problem, nothing has been collected. You can reach the team on ${phone} or at ${email} (${hours}).`,
+        timestamp: new Date(),
+      },
+    ]);
+  }, []);
 
   const send = useCallback(
     async (text: string) => {
@@ -109,11 +124,22 @@ export function useConversation() {
 
   const reset = useCallback(() => {
     controllerRef.current?.abort();
+    controllerRef.current = null;
+
     setLoading(false);
-    setMessages([createGreeting()]);
-    setState((prev) => ({ ...initialState, privacyAcknowledgedAt: prev.privacyAcknowledgedAt }));
+
+    // Preserve consent only if the user has accepted it.
+    const acknowledgedAt = state.privacyDeclined ? undefined : state.privacyAcknowledgedAt;
+
+    setMessages(acknowledgedAt ? [createGreeting()] : []);
+
+    setState({
+      ...initialState,
+      ...(acknowledgedAt ? { privacyAcknowledgedAt: acknowledgedAt } : {}),
+    });
+
     setSessionId(crypto.randomUUID());
-  }, []);
+  }, [state.privacyAcknowledgedAt, state.privacyDeclined]);
 
   return {
     messages,
