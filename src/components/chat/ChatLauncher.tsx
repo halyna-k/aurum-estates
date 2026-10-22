@@ -49,7 +49,7 @@ export default function ChatLauncher({
         )}
       </svg>
 
-      {!open && unread > 0 && (
+      {!open && (unread > 0 || pulse) && (
         <span
           aria-hidden="true"
           className="absolute -top-0.5 -right-0.5 size-4 rounded-full border-2 border-surface bg-danger"
