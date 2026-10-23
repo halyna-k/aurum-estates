@@ -1,24 +1,25 @@
 import type { AgencyConfig } from "@/types/agency";
 import type { LeadAnswers } from "@/types/lead";
 import type { LeadField } from "@/types/chat";
+import { FIELD_ORDER } from "./fields";
 
 /** Order in which the assistant asks for details. */
-export const FIELD_ORDER = [
-  "fullName",
-  "email",
-  "phone",
-  "propertyType",
-  "bedrooms",
-  "budget",
-  "area",
-  "moveInDate",
-  "employmentStatus",
-  "annualIncome",
-  "hasGuarantor",
-  "occupants",
-  "hasPets",
-  "viewingPreference",
-] as const satisfies readonly (keyof LeadAnswers)[];
+// export const FIELD_ORDER = [
+//   "fullName",
+//   "email",
+//   "phone",
+//   "propertyType",
+//   "bedrooms",
+//   "budget",
+//   "area",
+//   "moveInDate",
+//   "employmentStatus",
+//   "annualIncome",
+//   "hasGuarantor",
+//   "occupants",
+//   "hasPets",
+//   "viewingPreference",
+// ] as const satisfies readonly (keyof LeadAnswers)[];
 
 export interface PromptState {
   today: string;

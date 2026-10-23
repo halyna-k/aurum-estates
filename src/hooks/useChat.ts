@@ -32,7 +32,7 @@ export function useChat() {
     return () => clearTimeout(id);
   }, [open]);
 
-const pulse = pulseDue && !open;
+  const pulse = pulseDue && !open;
 
   const openChat = useCallback(() => {
     setPulseDue(false);
