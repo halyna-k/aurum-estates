@@ -4,7 +4,8 @@ import Groq from "groq-sdk";
 import { agency } from "@/agency/config";
 import { PROPERTIES } from "@/agency/properties";
 import { aiConfig } from "@/lib/chat/model";
-import { FIELD_ORDER, buildSystemPrompt } from "@/lib/chat/prompt";
+import { FIELD_ORDER } from "@/lib/chat/fields";
+import { buildSystemPrompt } from "@/lib/chat/prompt";
 import {
   chatRequestSchema,
   modelOutputSchema,
