@@ -25,6 +25,7 @@ npm run dev
 | ------------------------------ | ----------------------------------------------------------- |
 | `GROQ_API_KEY`                 | Groq API key for the assistant                              |
 | `SITE_URL`                     | Public site URL, used for metadata                          |
+| `SESSION_SECRET`               | Secret that signs chat sessions, at least 32 characters     |
 | `RESEND_API_KEY`               | Resend API key for lead emails                              |
 | `RESEND_FROM_EMAIL`            | Sender address of system emails (domain verified in Resend) |
 | `LEAD_NOTIFY_EMAIL`            | Address(es) that receive new leads, comma-separated         |

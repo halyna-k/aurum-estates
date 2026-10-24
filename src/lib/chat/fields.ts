@@ -146,6 +146,10 @@ export function fieldSpec(key: AskedField): (typeof FIELDS)[number] {
   return FIELDS.find((spec) => spec.key === key)!;
 }
 
+export function isAsked(key: string): key is AskedField {
+  return (FIELD_ORDER as string[]).includes(key);
+}
+
 const DEFAULT_RECHECK = "That does not look right. Could you check it, please?";
 
 /** The message that asks again after an answer that could not be used. */
