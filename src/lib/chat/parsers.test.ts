@@ -13,7 +13,8 @@ import {
   parsePets,
   parsePhone,
   parsePropertyType,
-  parseText,
+  parseArea,
+  parseViewing,
   parseYesNo,
 } from "./parsers";
 
@@ -184,16 +185,64 @@ describe("choices", () => {
   });
 });
 
-describe("free text and declining", () => {
-  it("accepts short free text and rejects empty or numeric answers", () => {
-    expect(value(parseText("  Any   weekday evening ", 300))).toBe("Any weekday evening");
-    expect(reason(parseText("", 300))).toBe("unclear");
-    expect(reason(parseText("12345", 300))).toBe("unclear");
+describe("negative and implausible numbers", () => {
+  it("rejects a minus sign, but not a range", () => {
+    expect(reason(parseBudget("-900"))).toBe("out_of_range");
+    expect(reason(parseBudget("£-900"))).toBe("out_of_range");
+    expect(reason(parseIncome("-900"))).toBe("out_of_range");
+    expect(reason(parseOccupants("-2"))).toBe("out_of_range");
+    expect(reason(parseBedrooms("-1"))).toBe("out_of_range");
+    expect(value(parseBudget("2000-2500"))).toBe(2500);
+    expect(value(parseBudget("2000 - 2500"))).toBe(2500);
   });
 
+  it("rejects 18 people", () => {
+    expect(reason(parseOccupants("18"))).toBe("out_of_range");
+  });
+});
+
+describe("parseArea", () => {
+  it("tidies the case and keeps postcodes in capitals", () => {
+    expect(value(parseArea("croydon"))).toBe("Croydon");
+    expect(value(parseArea("south london"))).toBe("South London");
+    expect(value(parseArea("e1"))).toBe("E1");
+    expect(value(parseArea("Notting Hill"))).toBe("Notting Hill");
+  });
+
+  it("rejects empty or meaningless answers", () => {
+    expect(reason(parseArea("?"))).toBe("unclear");
+    expect(reason(parseArea("12345"))).toBe("unclear");
+  });
+});
+
+describe("parseViewing", () => {
+  const NOW_VIEW = new Date("2026-10-23T12:00:00Z");
+
+  it.each([
+    "weekday evenings",
+    "Saturday morning",
+    "after 5pm",
+    "any time",
+    "weekends",
+    "next Tuesday",
+    "15 November at 2pm",
+  ])("accepts %j", (text) => {
+    expect(value(parseViewing(text, NOW_VIEW))).toBe(text);
+  });
+
+  it.each(["nights", "at midnight", "any time at night", "stuff", "12345", ""])(
+    "rejects %j",
+    (text) => {
+      expect(reason(parseViewing(text, NOW_VIEW))).toBe("unclear");
+    },
+  );
+});
+
+describe("declining", () => {
   it("detects a polite refusal", () => {
     expect(isDecline("I'd rather not say")).toBe(true);
     expect(isDecline("skip")).toBe(true);
+    expect(isDecline("Skip")).toBe(true);
     expect(isDecline("yes")).toBe(false);
   });
 });

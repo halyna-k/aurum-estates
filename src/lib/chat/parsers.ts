@@ -3,7 +3,6 @@ import { findPhoneNumbersInText, parsePhoneNumberFromString } from "libphonenumb
 import { z } from "zod";
 
 /** Server only: libphonenumber-js is too large for the browser bundle. */
-
 export type ParseFailure = "unclear" | "out_of_range" | "in_the_past";
 
 export type ParseResult<T> = { ok: true; value: T } | { ok: false; reason: ParseFailure };
@@ -12,7 +11,6 @@ const ok = <T>(value: T): ParseResult<T> => ({ ok: true, value });
 const fail = (reason: ParseFailure): ParseResult<never> => ({ ok: false, reason });
 
 /* ---------- Dates ---------- */
-
 const pad = (n: number) => String(n).padStart(2, "0");
 
 function toIso(date: Date): string {
@@ -83,7 +81,6 @@ export function parseMoveInDate(text: string, now = new Date()): ParseResult<str
 }
 
 /* ---------- Names, email, phone ---------- */
-
 const NAME_LEAD =
   /^(?:(?:hi|hello|hey)\b[\s,!.]*)?(?:my name is|my name's|i am|i'm|im|it is|it's|this is|name is|call me)\s+/i;
 const NAME_WORD = /^\p{L}[\p{L}'’.-]*$/u;
@@ -132,7 +129,6 @@ export function formatPhone(e164: string): string {
 }
 
 /* ---------- Numbers ---------- */
-
 const NUMBER_WORDS: Record<string, number> = {
   zero: 0,
   one: 1,
@@ -149,6 +145,10 @@ const NUMBER_WORDS: Record<string, number> = {
 
 const NUMBER_TOKEN = new RegExp(`\\b(\\d+|${Object.keys(NUMBER_WORDS).join("|")})\\b`, "gi");
 
+function isNegative(text: string): boolean {
+  return /(?<!\d\s*)-\s?\d|\bminus\b/i.test(text);
+}
+
 function counts(text: string): number[] {
   return [...text.matchAll(NUMBER_TOKEN)].map(
     (m) => NUMBER_WORDS[m[1].toLowerCase()] ?? Number(m[1]),
@@ -161,12 +161,14 @@ function inRange(value: number, min: number, max: number): ParseResult<number> {
 
 export function parseBedrooms(text: string): ParseResult<number> {
   if (/\bstudio\b/i.test(text)) return ok(0);
+  if (isNegative(text)) return fail("out_of_range");
   const found = counts(text);
   return found.length ? inRange(Math.max(...found), 0, 10) : fail("unclear");
 }
 
 export function parseOccupants(text: string): ParseResult<number> {
   if (/\b(just me|only me|myself|on my own|alone)\b/i.test(text)) return ok(1);
+  if (isNegative(text)) return fail("out_of_range");
   const found = counts(text);
   return found.length
     ? inRange(
@@ -189,6 +191,7 @@ const MONTHLY = /\b(pcm|per month|a month|monthly|each month)\b|\/m\b/i;
 
 /** Monthly rent budget in GBP. Weekly figures are converted to a calendar month. */
 export function parseBudget(text: string): ParseResult<number> {
+  if (isNegative(text)) return fail("out_of_range");
   const found = amounts(text);
   if (!found.length) return fail("unclear");
   const top = Math.max(...found);
@@ -199,6 +202,7 @@ export function parseBudget(text: string): ParseResult<number> {
 /** Gross annual income in GBP. Monthly and weekly figures are annualised. */
 export function parseIncome(text: string): ParseResult<number> {
   if (/\b(none|nothing|nil|zero|no income)\b/i.test(text)) return ok(0);
+  if (isNegative(text)) return fail("out_of_range");
   const found = amounts(text);
   if (!found.length) return fail("unclear");
   const top = Math.max(...found);
@@ -207,7 +211,6 @@ export function parseIncome(text: string): ParseResult<number> {
 }
 
 /* ---------- Choices ---------- */
-
 export function parseYesNo(text: string): ParseResult<boolean> {
   const t = text.trim().toLowerCase();
   if (/^(no|nope|nah|n|none|not really|i do not|i don'?t|we don'?t|we do not)\b/.test(t))
@@ -260,11 +263,40 @@ export function parseEmployment(text: string) {
 }
 
 /* ---------- Free text and declining ---------- */
+/** Postcode districts such as e1 or sw3 are upper case, other words start with a capital. */
+function titleArea(value: string): string {
+  return value
+    .split(" ")
+    .map((word) => (/\d/.test(word) ? word.toUpperCase() : titleCase(word)))
+    .join(" ");
+}
 
-export function parseText(text: string, max: number): ParseResult<string> {
+const POSTCODE = /^[a-z]{1,2}\d{1,2}[a-z]?(?: ?\d[a-z]{2})?$/i;
+
+export function parseArea(text: string): ParseResult<string> {
+  const value = text
+    .trim()
+    .replace(/[.!]+$/, "")
+    .replace(/\s+/g, " ");
+  if (POSTCODE.test(value)) return ok(value.toUpperCase());
+  const letters = value.replace(/[^\p{L}]/gu, "");
+  if (value.length > 100 || letters.length < 2 || !/^[\p{L}\p{N}\s,'’&.-]+$/u.test(value)) {
+    return fail("unclear");
+  }
+  return ok(value === value.toLowerCase() ? titleArea(value) : value);
+}
+
+const NIGHT = /\b(nights?|midnight|overnight)\b/i;
+const DAY_OR_TIME =
+  /\b(mon|tues?|wed|thu(?:rs?)?|fri|sat|sun)(?:day|sday|nesday|rsday|urday)?s?\b|\b(weekdays?|weekends?|mornings?|afternoons?|evenings?|lunch(?:time)?|any ?time|any day|flexible|whenever|today|tomorrow)\b|\b\d{1,2}(?::\d{2})?\s?(?:am|pm)\b|\b\d{1,2}:\d{2}\b/i;
+
+/** Days or times that make sense for a viewing. "nights" does not. */
+export function parseViewing(text: string, now = new Date()): ParseResult<string> {
   const value = text.trim().replace(/\s+/g, " ");
-  if (value.length < 2 || value.length > max || !/\p{L}/u.test(value)) return fail("unclear");
-  return ok(value);
+  if (value.length < 2 || value.length > 300 || NIGHT.test(value)) return fail("unclear");
+  const hasTime =
+    DAY_OR_TIME.test(value) || chrono.en.GB.parseDate(value, londonToday(now)) !== null;
+  return hasTime ? ok(value) : fail("unclear");
 }
 
 export function isDecline(text: string): boolean {
