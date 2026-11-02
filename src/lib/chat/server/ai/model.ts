@@ -1,3 +1,5 @@
+import "server-only";
+
 export const aiConfig = {
   model: "openai/gpt-oss-120b",
   temperature: 0.2,
