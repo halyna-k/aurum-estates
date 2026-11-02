@@ -6,6 +6,7 @@ import {
   newSession,
   nextField,
   openSession,
+  reopenField,
   sealSession,
 } from "./session";
 
@@ -210,5 +211,24 @@ describe("sealed session", () => {
     const old = { ...sample, answers: { ...sample.answers, retiredField: "x" } } as Session;
     const opened = openSession(sealSession(old, SECRET, NOW), SECRET, NOW);
     expect(opened?.answers).not.toHaveProperty("retiredField");
+  });
+});
+
+describe("reopenField", () => {
+  it("forgets one answer and goes back to collecting", () => {
+    const s = session({
+      phase: "confirming",
+      answers: { fullName: "Tom Ford", email: "t@example.com" },
+      declined: ["phone"],
+    });
+    const reopened = reopenField(s, "email");
+    expect(reopened.phase).toBe("collecting");
+    expect(reopened.answers).toEqual({ fullName: "Tom Ford" });
+    expect(nextField(reopened, ctx)).toBe("email");
+  });
+
+  it("asks again about a field that was declined", () => {
+    const s = session({ declined: ["phone"] });
+    expect(reopenField(s, "phone").declined).toEqual([]);
   });
 });

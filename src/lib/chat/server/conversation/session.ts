@@ -1,8 +1,16 @@
+import "server-only";
+
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import type { LeadAnswers } from "@/types/lead";
-import { type AskedField, FIELD_ORDER, fieldSpec, isAsked, retryText } from "./fields";
-import { isDecline } from "./parsers";
+import {
+  type AskedField,
+  FIELD_ORDER,
+  fieldSpec,
+  isAsked,
+  retryText,
+} from "@/lib/chat/server/answers/fields";
+import { isDecline } from "@/lib/chat/server/answers/parsers";
 
 export type Phase = "collecting" | "confirming" | "saved" | "closed";
 
@@ -43,12 +51,11 @@ export function newSession(propertyId?: string): Session {
 }
 
 /* ---------- What to ask next ---------- */
-
 function isSettled(session: Session, key: AskedField): boolean {
   return session.answers[key] !== undefined || session.declined.includes(key);
 }
 
-function isSkipped(session: Session, key: AskedField, ctx: Context): boolean {
+export function isSkipped(session: Session, key: AskedField, ctx: Context): boolean {
   if (ctx.propertyRentPcm !== undefined && PROPERTY_FIELDS.includes(key)) return true;
 
   if (key === "hasGuarantor") {
@@ -68,7 +75,6 @@ export function nextField(session: Session, ctx: Context): AskedField | undefine
 }
 
 /* ---------- Taking an answer ---------- */
-
 function withAnswer(answers: Partial<LeadAnswers>, field: AskedField, value: unknown) {
   return { ...answers, [field]: value } as Partial<LeadAnswers>;
 }
@@ -77,6 +83,19 @@ function withoutAttempts(attempts: Session["attempts"], field: AskedField): Sess
   return Object.fromEntries(
     Object.entries(attempts).filter(([key]) => key !== field),
   ) as Session["attempts"];
+}
+
+/** Forgets an answer so that the field is asked again, for a correction. */
+export function reopenField(session: Session, field: AskedField): Session {
+  return {
+    ...session,
+    phase: "collecting",
+    answers: Object.fromEntries(
+      Object.entries(session.answers).filter(([key]) => key !== field),
+    ) as Partial<LeadAnswers>,
+    declined: session.declined.filter((key) => key !== field),
+    attempts: withoutAttempts(session.attempts, field),
+  };
 }
 
 export function applyAnswer(
@@ -136,7 +155,6 @@ export function applyAnswer(
 }
 
 /* ---------- Signing, so the browser cannot edit the session ---------- */
-
 const MAX_AGE_MS = 2 * 60 * 60 * 1000;
 
 const sessionSchema = z.object({
