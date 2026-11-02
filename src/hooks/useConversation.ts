@@ -2,24 +2,33 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { agency } from "@/agency/config";
-import { MAX_MESSAGE_LENGTH } from "@/lib/chat/limits";
+import { PROPERTIES } from "@/agency/properties";
+import { MAX_HISTORY_MESSAGES, MAX_MESSAGE_LENGTH } from "@/lib/chat/limits";
 import { sendMessage } from "@/lib/chat/client";
 import type { ChatMessage, ConversationState, UIMessage } from "@/types/chat";
 
 const initialState: ConversationState = {
   leadData: {},
-  declinedFields: [],
   leadSaved: false,
+  closed: false,
+  suggestions: [],
   privacyDeclined: false,
 };
 
 const GENERIC_ERROR = "Sorry, something went wrong. Please try again.";
 
-function createGreeting(): UIMessage {
+function createGreeting(propertyId?: string): UIMessage {
+  const property = PROPERTIES.find((item) => item.id === propertyId);
+  const lines = [
+    agency.chat.greeting,
+    property && `I see you are interested in ${property.address}.`,
+    agency.chat.opening,
+  ];
+
   return {
     id: "greeting",
     role: "assistant",
-    text: agency.chat.greeting,
+    text: lines.filter(Boolean).join("\n\n"),
     timestamp: new Date(),
   };
 }
@@ -42,7 +51,7 @@ export function useConversation() {
   useEffect(() => () => controllerRef.current?.abort(), []);
 
   const setProperty = useCallback((propertyId: string) => {
-    setState((prev) => ({ ...prev, leadData: { ...prev.leadData, propertyId } }));
+    setState((prev) => ({ ...prev, propertyId }));
   }, []);
 
   const addMessage = useCallback((role: UIMessage["role"], text: string, isError = false) => {
@@ -83,8 +92,8 @@ export function useConversation() {
   const send = useCallback(
     async (text: string) => {
       const content = text.trim().slice(0, MAX_MESSAGE_LENGTH);
-      const { privacyAcknowledgedAt, leadData, declinedFields } = state;
-      if (!content || loading || !privacyAcknowledgedAt) return;
+      const { privacyAcknowledgedAt, sessionToken, propertyId, closed } = state;
+      if (!content || loading || closed || !privacyAcknowledgedAt) return;
 
       const controller = new AbortController();
       controllerRef.current = controller;
@@ -94,21 +103,23 @@ export function useConversation() {
       try {
         const reply = await sendMessage(
           {
-            messages: [...toHistory(messages), { role: "user", content }],
-            leadData,
-            declinedFields,
-            leadSaved: state.leadSaved,
+            message: content,
+            history: toHistory(messages).slice(-MAX_HISTORY_MESSAGES),
+            sessionToken,
             sessionId,
             privacyAcknowledgedAt,
+            propertyId,
           },
           controller.signal,
         );
 
         setState((prev) => ({
           ...prev,
+          sessionToken: reply.sessionToken,
           leadData: reply.leadData,
-          declinedFields: reply.declinedFields,
-          leadSaved: reply.leadSaved,
+          leadSaved: prev.leadSaved || reply.leadSaved,
+          closed: reply.closed,
+          suggestions: reply.suggestions,
           agentPreview: reply.agentPreview ?? prev.agentPreview,
         }));
         addMessage("assistant", reply.message);

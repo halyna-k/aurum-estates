@@ -3,23 +3,23 @@ import Groq from "groq-sdk";
 
 import { agency } from "@/agency/config";
 import { PROPERTIES } from "@/agency/properties";
-import { aiConfig } from "@/lib/chat/model";
-import { FIELD_ORDER, buildSystemPrompt } from "@/lib/chat/prompt";
+import { afterSave, restartTurn, takeTurn } from "@/lib/chat/server/conversation/flow";
+import { MAX_BODY_CHARS, MAX_HISTORY_MESSAGES } from "@/lib/chat/limits";
+import { aiConfig } from "@/lib/chat/server/ai/model";
+import { buildFaqPrompt } from "@/lib/chat/server/ai/prompt";
+import { chatRequestSchema, parseLeadAnswers } from "@/lib/chat/server/schemas";
 import {
-  chatRequestSchema,
-  modelOutputSchema,
-  parseFields,
-  parseLeadAnswers,
-} from "@/lib/chat/schemas";
+  type Context,
+  newSession,
+  openSession,
+  sealSession,
+} from "@/lib/chat/server/conversation/session";
 import { buildLead, hasContact } from "@/lib/leads/buildLead";
 import { saveLead } from "@/lib/leads/stores/memory";
 import { isRateLimited } from "@/lib/rateLimit";
-import type { AgentPreviewData, ChatReply, LeadField } from "@/types/chat";
-import { MAX_BODY_CHARS, MAX_HISTORY_MESSAGES } from "@/lib/chat/limits";
+import type { AgentPreviewData, ChatMessage, ChatReply } from "@/types/chat";
 
 export const maxDuration = 30;
-
-const REQUIRED_FIELDS: LeadField[] = ["fullName", "email"];
 
 let groqClient: Groq | undefined;
 
@@ -60,10 +60,42 @@ function todayInLondon(): string {
   return `${long} (${iso})`;
 }
 
-export async function POST(req: NextRequest) {
+const findProperty = (id: string | undefined) => PROPERTIES.find((property) => property.id === id);
+
+/** The model only answers general questions. It never changes the conversation. */
+async function answerQuestion(
+  history: ChatMessage[],
+  question: string,
+): Promise<string | undefined> {
   const groq = getGroq();
   if (!groq) {
     console.error("GROQ_API_KEY is not set");
+    return undefined;
+  }
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: aiConfig.model,
+      messages: [
+        { role: "system", content: buildFaqPrompt(agency, PROPERTIES, todayInLondon()) },
+        ...history.slice(-MAX_HISTORY_MESSAGES),
+        { role: "user", content: question },
+      ],
+      temperature: aiConfig.temperature,
+      max_completion_tokens: aiConfig.maxTokens,
+    });
+    return completion.choices[0]?.message?.content?.trim() || undefined;
+  } catch (error) {
+    const status = error instanceof Groq.APIError ? error.status : undefined;
+    console.error("Model request failed", { status });
+    return undefined;
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    console.error("SESSION_SECRET is not set");
     return fail("The assistant is not available right now.", 500);
   }
 
@@ -83,79 +115,59 @@ export async function POST(req: NextRequest) {
   const parsed = chatRequestSchema.safeParse(json);
   if (!parsed.success) return fail("Invalid request.", 400);
   const request = parsed.data;
+  const now = new Date();
 
-  // The client state is untrusted: keep only valid fields, and never allow
-  // the applicant to decline the contact details an agent needs to reply.
-  const clientAnswers = parseLeadAnswers(request.leadData);
-  const clientDeclined = parseFields(request.declinedFields);
+  // The session is signed, so the browser cannot change what has been recorded.
+  const opened = request.sessionToken ? openSession(request.sessionToken, secret, now) : null;
+  const timedOut = Boolean(request.sessionToken) && !opened;
+  const requested = findProperty(request.propertyId);
 
-  const systemPrompt = buildSystemPrompt(agency, {
-    today: todayInLondon(),
-    collected: clientAnswers,
-    declined: clientDeclined,
-    leadSaved: request.leadSaved,
-  });
-
-  let content: string;
-  try {
-    const completion = await groq.chat.completions.create({
-      model: aiConfig.model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...request.messages.slice(-MAX_HISTORY_MESSAGES),
-      ],
-      temperature: aiConfig.temperature,
-      max_completion_tokens: aiConfig.maxTokens,
-      response_format: { type: "json_object" },
-    });
-    content = completion.choices[0]?.message?.content?.trim() ?? "";
-  } catch (error) {
-    const status = error instanceof Groq.APIError ? error.status : undefined;
-    console.error("Model request failed", { status });
-    if (status === 429) {
-      return fail("I am receiving a lot of requests right now. Please try again in a moment.", 503);
-    }
-    return fail("I am having a technical issue. Please try again shortly.", 502);
+  let session = opened ?? newSession(requested?.id);
+  if (
+    opened &&
+    requested &&
+    session.phase === "collecting" &&
+    session.answers.propertyId !== requested.id
+  ) {
+    session = { ...session, answers: { ...session.answers, propertyId: requested.id } };
   }
 
-  let output;
-  try {
-    output = modelOutputSchema.parse(JSON.parse(content));
-  } catch {
-    console.error("Model returned an unusable reply");
-    return fail("I am having a technical issue. Please try again shortly.", 502);
-  }
+  const property = findProperty(session.answers.propertyId);
+  const ctx: Context = {
+    propertyRentPcm: property?.rentPcm,
+    incomeToAnnualRent: agency.triage.incomeToAnnualRent,
+  };
 
-  // Merge: the model may add or correct fields, never remove them.
-  const leadData = { ...clientAnswers, ...parseLeadAnswers(output.leadData) };
+  const turn = timedOut
+    ? restartTurn(session, ctx)
+    : takeTurn({ session, text: request.message, ctx, agency, property, now });
 
-  const declinedFields = [
-    ...new Set([...clientDeclined, ...parseFields(output.declinedFields)]),
-  ].filter((field) => !REQUIRED_FIELDS.includes(field) && leadData[field] === undefined);
-
-  const remaining = FIELD_ORDER.filter(
-    (field) => leadData[field] === undefined && !declinedFields.includes(field),
-  );
-
-  let leadSaved = request.leadSaved;
+  let message: string;
+  let suggestions: string[];
   let agentPreview: AgentPreviewData | undefined;
+  session = turn.session;
 
-  // Save once the applicant has confirmed, and update the lead on later turns.
-  if (remaining.length === 0 && hasContact(leadData) && (output.confirmed || request.leadSaved)) {
-    const monthlyRent =
-      PROPERTIES.find((property) => property.id === leadData.propertyId)?.rentPcm ??
-      leadData.budget;
+  if (turn.kind === "say") {
+    message = turn.message;
+    suggestions = turn.suggestions;
+  } else if (turn.kind === "ask_model") {
+    const answer = await answerQuestion(request.history, request.message);
+    const fallback = `Sorry, I cannot answer that just now. You can ask the team on ${agency.chat.humanContact.phone}.`;
+    message = `${answer ?? fallback}\n\n${turn.then}`;
+    suggestions = turn.suggestions;
+  } else {
+    const answers = parseLeadAnswers(session.answers);
+    if (!hasContact(answers)) return fail("Invalid request.", 400);
 
     try {
       const lead = buildLead({
-        answers: leadData,
-        monthlyRent,
+        answers,
+        monthlyRent: property?.rentPcm ?? answers.budget,
         sessionId: request.sessionId,
         privacyAcknowledgedAt: request.privacyAcknowledgedAt,
         agency,
       });
       await saveLead(lead);
-      leadSaved = true;
 
       if (agency.isDemo) {
         agentPreview = {
@@ -171,13 +183,20 @@ export async function POST(req: NextRequest) {
         500,
       );
     }
+
+    const done = afterSave(session, agency);
+    session = done.session;
+    message = done.message;
+    suggestions = done.suggestions;
   }
 
   const reply: ChatReply = {
-    message: output.message,
-    leadData,
-    declinedFields,
-    leadSaved,
+    message,
+    sessionToken: sealSession(session, secret, now),
+    leadData: session.answers,
+    leadSaved: session.phase === "saved",
+    closed: session.phase === "closed",
+    suggestions,
     agentPreview,
   };
 

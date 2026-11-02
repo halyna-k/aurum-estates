@@ -21,10 +21,12 @@ function isChatReply(data: unknown): data is ChatReply {
   const reply = data as Record<string, unknown>;
   return (
     typeof reply.message === "string" &&
+    typeof reply.sessionToken === "string" &&
     typeof reply.leadData === "object" &&
     reply.leadData !== null &&
-    Array.isArray(reply.declinedFields) &&
-    typeof reply.leadSaved === "boolean"
+    typeof reply.leadSaved === "boolean" &&
+    typeof reply.closed === "boolean" &&
+    Array.isArray(reply.suggestions)
   );
 }
 

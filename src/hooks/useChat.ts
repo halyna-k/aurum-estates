@@ -5,11 +5,12 @@ import { onChatRequest } from "@/lib/chat/events";
 import { useConversation } from "./useConversation";
 
 const PULSE_DELAY_MS = 5000;
+const CLOSE_DELAY_MS = 4000;
 
 export function useChat() {
   const conversation = useConversation();
   const { messages, state } = conversation;
-  const { setProperty } = conversation;
+  const { setProperty, reset } = conversation;
 
   const [open, setOpen] = useState(false);
   const [seenCount, setSeenCount] = useState(0);
@@ -32,12 +33,12 @@ export function useChat() {
     return () => clearTimeout(id);
   }, [open]);
 
-const pulse = pulseDue && !open;
+  const pulse = pulseDue && !open;
 
   const openChat = useCallback(() => {
-    setPulseDue(false);
+    if (state.closed) reset();
     setOpen(true);
-  }, []);
+  }, [state.closed, reset]);
 
   const closeChat = useCallback(() => {
     setSeenCount(messages.length);
@@ -46,14 +47,21 @@ const pulse = pulseDue && !open;
     requestAnimationFrame(() => launcherRef.current?.focus());
   }, [messages.length]);
 
+  // Close the window shortly after the goodbye.
+  useEffect(() => {
+    if (!open || !state.closed || !state.leadSaved) return;
+    const id = setTimeout(closeChat, CLOSE_DELAY_MS);
+    return () => clearTimeout(id);
+  }, [open, state.closed, state.leadSaved, closeChat]);
+
   useEffect(
     () =>
       onChatRequest((propertyId) => {
+        if (state.closed) reset();
         if (propertyId) setProperty(propertyId);
-        setPulseDue(false);
         setOpen(true);
       }),
-    [setProperty],
+    [state.closed, reset, setProperty],
   );
 
   useEffect(() => {
