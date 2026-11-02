@@ -26,6 +26,21 @@ describe("question flow", () => {
   });
 });
 
+describe("quick replies", () => {
+  it("offers only answers that the field accepts", () => {
+    for (const spec of FIELDS) {
+      for (const choice of spec.choices ?? []) {
+        expect(spec.parse(choice, NOW).ok, `${spec.key}: ${choice}`).toBe(true);
+      }
+    }
+  });
+
+  it("gives every detail its own label", () => {
+    const labels = FIELDS.map((spec) => spec.label);
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+});
+
 describe("retry messages", () => {
   it("uses the retry text when the answer was not understood", () => {
     expect(retryText(fieldSpec("email"), "unclear")).toBe(fieldSpec("email").retry);

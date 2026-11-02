@@ -162,7 +162,7 @@ describe("parseYesNo and parsePets", () => {
     expect(reason(parseYesNo("maybe"))).toBe("unclear");
   });
 
-  it("recognises pets by name but never guesses", () => {
+  it("recognizes pets by name but never guesses", () => {
     expect(value(parsePets("I have a dog"))).toBe(true);
     expect(value(parsePets("no pets"))).toBe(false);
     expect(reason(parsePets("crocodile"))).toBe("unclear");
