@@ -27,6 +27,7 @@ const SHOW: Record<AskedField, (answers: Partial<LeadAnswers>) => string | undef
   hasGuarantor: (a) => yesNo(a.hasGuarantor),
   occupants: (a) => a.occupants?.toString(),
   hasPets: (a) => yesNo(a.hasPets),
+  requirements: (a) => a.requirements,
   viewingPreference: (a) => a.viewingPreference,
 };
 

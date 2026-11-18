@@ -44,6 +44,9 @@ export interface LeadAnswers {
   /** Informational only, never used in triage. */
   hasPets?: boolean;
 
+  /** Free text for any other requirements. */
+  requirements?: string;
+
   /** Preferred viewing days and times, free text. */
   viewingPreference?: string;
 }

@@ -24,6 +24,7 @@ const leadFieldShape = {
   hasGuarantor: z.boolean(),
   occupants: z.number().int().min(1).max(10),
   hasPets: z.boolean(),
+  requirements: text(300),
   viewingPreference: text(300),
 };
 

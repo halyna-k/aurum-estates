@@ -47,6 +47,7 @@ const FIELD_WORDS: [AskedField, RegExp][] = [
   ["annualIncome", /\b(income|salary|earn\w*)\b/i],
   ["hasGuarantor", /\bguarantor\b/i],
   ["hasPets", /\bpets?\b/i],
+  ["requirements", /\b(requirements|needs|wants)\b/i],
   ["viewingPreference", /\b(viewing|view)\b/i],
 ];
 
