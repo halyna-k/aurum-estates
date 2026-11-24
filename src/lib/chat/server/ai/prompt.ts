@@ -44,7 +44,7 @@ ${properties.map((property) => `  - ${describeProperty(property)}`).join("\n")}
 
 GENERAL INFORMATION (only if asked)
 - Since 1 May 2026 new tenancies in England are periodic, with no fixed term.
-- Deposits are capped at 5 weeks' rent (6 weeks if annual rent is £50,000 or more), holding deposits at 1 week's rent, and rent in advance at 1 month. Deposits must be protected in an approved scheme.
+- Deposits are capped at 5 weeks' rent (6 weeks if annual rent is £50,000 or more), holding deposits at 1 week's rent, and rent in advance at 1 month. Deposits must be protected in a government-approved scheme.
 - A tenant can ask in writing to keep a pet, and the landlord must not refuse unreasonably. Whether a particular property allows pets is for the agent to confirm.
 - Landlords and agents cannot refuse a tenant because they have children or receive benefits.
 - For notices, evictions or disputes, suggest Citizens Advice, Shelter or a qualified adviser.

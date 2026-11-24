@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { chatRequestSchema, parseLeadAnswers } from "./schemas";
 
 const request = {
-  message: "Tom Ford",
+  message: "Tom Smith",
   history: [{ role: "assistant", content: "Hello" }],
   sessionId: "5f0f3a4e-2b8c-4a43-9a43-6f5c6e0d8f10",
   privacyAcknowledgedAt: "2026-10-23T12:00:00.000Z",
@@ -36,7 +36,7 @@ describe("chatRequestSchema", () => {
 describe("parseLeadAnswers", () => {
   it("keeps what the parsers produce", () => {
     const answers = {
-      fullName: "Tom Ford",
+      fullName: "Tom Smith",
       email: "tom@example.com",
       phone: "+447911123456",
       budget: 2500,
