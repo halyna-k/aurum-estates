@@ -1,13 +1,15 @@
-import type { RefObject } from "react";
+"use client";
+
+import { useEffect, useRef, type RefObject } from "react";
 import { agency } from "@/agency/config";
+import Button from "@/components/ui/Button";
 import type { ConversationState, UIMessage } from "@/types/chat";
+import ChatMessages from "../messages/ChatMessages";
+import NotificationBar from "../messages/NotificationBar";
+import PrivacyNotice from "../PrivacyNotice";
+import ChatFooter from "./ChatFooter";
 import ChatHeader from "./ChatHeader";
 import ChatInput from "./ChatInput";
-import ChatMessages from "./ChatMessages";
-import ChatFooter from "./ChatFooter";
-import PrivacyNotice from "./PrivacyNotice";
-import NotificationBar from "./NotificationBar";
-import Button from "@/components/ui/Button";
 
 interface ChatPanelProps {
   id: string;
@@ -34,14 +36,22 @@ export default function ChatPanel({
   onReset,
   onClose,
 }: ChatPanelProps) {
-  const { privacyAcknowledgedAt, privacyDeclined, leadSaved } = state;
-  const { assistantName, humanContact } = agency.chat;
+  const { privacyAcknowledgedAt, privacyDeclined, leadSaved, closed } = state;
 
   const hasConsent = Boolean(privacyAcknowledgedAt);
   const showPrivacyNotice = !hasConsent && !privacyDeclined;
-  const showChatInput = hasConsent && !privacyDeclined;
-  const showStartAgain = privacyDeclined;
-  const showPrivacyFooter = hasConsent || privacyDeclined;
+  const showChatInput = hasConsent && !closed;
+  const showStartAgain = privacyDeclined || closed;
+
+  const typingExpected = !messages.at(-1)?.suggestions?.length;
+  const wasLoading = useRef(loading);
+
+  useEffect(() => {
+    if (wasLoading.current && !loading && showChatInput && typingExpected) {
+      inputRef.current?.focus();
+    }
+    wasLoading.current = loading;
+  }, [loading, showChatInput, typingExpected, inputRef]);
 
   return (
     <>
@@ -49,7 +59,6 @@ export default function ChatPanel({
         type="button"
         aria-hidden="true"
         tabIndex={-1}
-        aria-label="Close chat"
         onClick={onClose}
         className="fixed inset-0 z-50 cursor-default bg-black/60"
       />
@@ -58,7 +67,7 @@ export default function ChatPanel({
         id={id}
         role="dialog"
         aria-modal="true"
-        aria-label={`Chat with ${assistantName}`}
+        aria-label={`Chat with ${agency.chat.assistantName}`}
         onKeyDown={(e) => {
           if (e.key === "Escape") onClose();
         }}
@@ -66,16 +75,18 @@ export default function ChatPanel({
       >
         <ChatHeader onNewChat={onReset} onClose={onClose} />
 
-        <ChatMessages messages={messages} loading={loading} />
-
-        {leadSaved && (
-          <div role="status">
-            <NotificationBar tone="success">
-              Your details have been sent to the team. An agent will reply during working hours (
-              {humanContact.hours}).
-            </NotificationBar>
-          </div>
-        )}
+        <ChatMessages
+          messages={messages}
+          loading={loading}
+          onReply={onSend}
+          notice={
+            leadSaved ? (
+              <NotificationBar tone="success">
+                Your details have been sent to the team.
+              </NotificationBar>
+            ) : undefined
+          }
+        />
 
         {showPrivacyNotice && <PrivacyNotice onAccept={onAcknowledge} onDecline={onDecline} />}
 
@@ -89,7 +100,7 @@ export default function ChatPanel({
 
         {showChatInput && <ChatInput ref={inputRef} busy={loading} onSend={onSend} />}
 
-        <ChatFooter showPrivacy={showPrivacyFooter} />
+        <ChatFooter showPrivacy={hasConsent || privacyDeclined} />
       </div>
     </>
   );
