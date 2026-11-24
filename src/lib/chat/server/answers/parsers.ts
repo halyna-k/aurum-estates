@@ -1,33 +1,75 @@
+import "server-only";
+
 import * as chrono from "chrono-node";
 import { findPhoneNumbersInText, parsePhoneNumberFromString } from "libphonenumber-js";
 import { z } from "zod";
 
-/** Server only: libphonenumber-js is too large for the browser bundle. */
-export type ParseFailure = "unclear" | "out_of_range" | "in_the_past";
+export type ParseFailure = "unclear" | "too_low" | "out_of_range" | "in_the_past";
 
 export type ParseResult<T> = { ok: true; value: T } | { ok: false; reason: ParseFailure };
 
 const ok = <T>(value: T): ParseResult<T> => ({ ok: true, value });
-const fail = (reason: ParseFailure): ParseResult<never> => ({ ok: false, reason });
+const fail = (reason: ParseFailure): ParseResult<never> => ({
+  ok: false,
+  reason,
+});
 
 /* ---------- Dates ---------- */
 const pad = (n: number) => String(n).padStart(2, "0");
 
 function toIso(date: Date): string {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return [date.getUTCFullYear(), pad(date.getUTCMonth() + 1), pad(date.getUTCDate())].join("-");
 }
 
-/** Today's calendar date in London, as a local noon Date so arithmetic never crosses a day. */
+/** Returns a date at UTC noon using London's current calendar date. */
 function londonToday(now: Date): Date {
-  const [year, month, day] = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" })
-    .format(now)
-    .split("-")
-    .map(Number);
-  return new Date(year, month - 1, day, 12);
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/London",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((part) => part.type === type)?.value);
+
+  return new Date(Date.UTC(get("year"), get("month") - 1, get("day"), 12));
+}
+
+const NUMERIC_DATE = /\b(\d{1,2})[./-](\d{1,2})(?:[./-](\d{2}|\d{4}))?\b/;
+
+function numericDate(text: string, today: Date): Date | null {
+  const match = NUMERIC_DATE.exec(text);
+
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const yearText = match[3];
+
+  const year = yearText
+    ? yearText.length === 2
+      ? 2000 + Number(yearText)
+      : Number(yearText)
+    : today.getUTCFullYear();
+
+  const date = new Date(Date.UTC(year, month - 1, day, 12));
+
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  )
+    return null;
+
+  // Without a year, use the next occurrence.
+  if (!yearText && toIso(date) < toIso(today)) date.setUTCFullYear(year + 1);
+
+  return date;
 }
 
 const MONTH_ONLY =
-  /^(?:in |during |early |mid |late |the start of |the end of |end of )*(january|february|march|april|may|june|july|august|september|october|november|december)$/i;
+  /^(?:(?:in |during |early |mid |late |the start of |the end of |end of )*)(january|february|march|april|may|june|july|august|september|october|november|december)$/i;
 
 const MONTHS = [
   "january",
@@ -50,33 +92,54 @@ export function parseMoveInDate(text: string, now = new Date()): ParseResult<str
     .trim()
     .toLowerCase()
     .replace(/[.!]+$/, "");
+  if (!t) return fail("unclear");
   let date: Date | null = null;
 
-  const monthOnly = MONTH_ONLY.exec(t);
-  if (
+  const numericMatch = NUMERIC_DATE.test(t);
+
+  if (numericMatch) {
+    date = numericDate(t, today);
+
+    // Do not allow invalid numeric dates to fall through to chrono.
+    if (!date) return fail("unclear");
+  } else if (
     /\b(asap|as soon as possible|immediately|straight away|right away|now|today|this month)\b/.test(
       t,
     )
   ) {
     date = today;
   } else if (/\bnext week\b/.test(t)) {
-    date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7, 12);
+    date = new Date(today);
+    date.setUTCDate(date.getUTCDate() + 7);
   } else if (/\bnext month\b/.test(t)) {
-    date = new Date(today.getFullYear(), today.getMonth() + 1, 1, 12);
-  } else if (monthOnly) {
-    const month = MONTHS.indexOf(monthOnly[1].toLowerCase());
-    const year = month < today.getMonth() ? today.getFullYear() + 1 : today.getFullYear();
-    // The current month means "from today", any later month means its first day.
-    date = month === today.getMonth() ? today : new Date(year, month, 1, 12);
+    date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 1, 12));
   } else {
-    date = chrono.en.GB.parseDate(text, today, { forwardDate: true });
+    const monthOnly = MONTH_ONLY.exec(t);
+
+    if (monthOnly) {
+      const month = MONTHS.indexOf(monthOnly[1].toLowerCase());
+      const year =
+        month < today.getUTCMonth() ? today.getUTCFullYear() + 1 : today.getUTCFullYear();
+
+      date = month === today.getUTCMonth() ? today : new Date(Date.UTC(year, month, 1, 12));
+    } else {
+      date = chrono.en.GB.parseDate(text, today, {
+        forwardDate: true,
+      });
+    }
   }
 
-  if (!date) return fail("unclear");
+  if (!date || Number.isNaN(date.getTime())) return fail("unclear");
+
   const iso = toIso(date);
   if (iso < toIso(today)) return fail("in_the_past");
-  const limit = new Date(today.getFullYear() + 2, today.getMonth(), today.getDate(), 12);
+
+  const limit = new Date(
+    Date.UTC(today.getUTCFullYear() + 2, today.getUTCMonth(), today.getUTCDate(), 12),
+  );
+
   if (iso > toIso(limit)) return fail("out_of_range");
+
   return ok(iso);
 }
 
@@ -98,25 +161,29 @@ export function parseName(text: string): ParseResult<string> {
   const words = name.split(" ");
   const letters = name.replace(/[^\p{L}]/gu, "");
 
-  if (words.length < 2 || words.length > 5 || letters.length < 3 || name.length > 60) {
+  if (words.length < 2 || words.length > 5 || letters.length < 3 || name.length > 60)
     return fail("unclear");
-  }
+
   if (!words.every((word) => NAME_WORD.test(word))) return fail("unclear");
 
   const flat = name === name.toLowerCase() || name === name.toUpperCase();
   return ok(flat ? words.map(titleCase).join(" ") : name);
 }
 
-const EMAIL = /[^\s@<>()",;:]+@[^\s@<>()",;:]+\.[^\s@<>()",;:]*[^\s@<>()",;:.]/;
+const EMAIL =
+  /[A-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?(?:\.[A-Z0-9](?:[A-Z0-9-]*[A-Z0-9])?)+/i;
 
 export function parseEmail(text: string): ParseResult<string> {
   const match = EMAIL.exec(text);
   const email = match?.[0].toLowerCase();
-  if (!email || email.length > 254 || !z.email().safeParse(email).success) return fail("unclear");
+
+  if (!email || email.length > 254 || !z.string().email().safeParse(email).success)
+    return fail("unclear");
+
   return ok(email);
 }
 
-/** Returns the number in E.164 form, for example +447911123456. */
+/** Returns an E.164 phone number, for example +447911123456. */
 export function parsePhone(text: string): ParseResult<string> {
   const found = findPhoneNumbersInText(text, "GB").find((hit) => hit.number.isValid());
   return found ? ok(found.number.number) : fail("unclear");
@@ -145,18 +212,26 @@ const NUMBER_WORDS: Record<string, number> = {
 
 const NUMBER_TOKEN = new RegExp(`\\b(\\d+|${Object.keys(NUMBER_WORDS).join("|")})\\b`, "gi");
 
-function isNegative(text: string): boolean {
-  return /(?<!\d\s*)-\s?\d|\bminus\b/i.test(text);
-}
-
 function counts(text: string): number[] {
   return [...text.matchAll(NUMBER_TOKEN)].map(
-    (m) => NUMBER_WORDS[m[1].toLowerCase()] ?? Number(m[1]),
+    (match) => NUMBER_WORDS[match[1].toLowerCase()] ?? Number(match[1]),
+  );
+}
+
+/** Distinguishes negative amounts from ranges such as 2,000 - 2,500. */
+function isNegative(text: string): boolean {
+  const withoutRanges = text.replace(
+    /(\d[\d,]*(?:\.\d+)?)\s*-\s*£?\s*(\d[\d,]*(?:\.\d+)?)/g,
+    "$1 $2",
+  );
+
+  return (
+    /(?:^|[^\d])-\s*(?:£\s*)?\d/.test(withoutRanges) || /\bminus\s*(?:£\s*)?\d/i.test(withoutRanges)
   );
 }
 
 function inRange(value: number, min: number, max: number): ParseResult<number> {
-  return value >= min && value <= max ? ok(value) : fail("out_of_range");
+  return Number.isFinite(value) && value >= min && value <= max ? ok(value) : fail("out_of_range");
 }
 
 export function parseBedrooms(text: string): ParseResult<number> {
@@ -170,26 +245,26 @@ export function parseOccupants(text: string): ParseResult<number> {
   if (/\b(just me|only me|myself|on my own|alone)\b/i.test(text)) return ok(1);
   if (isNegative(text)) return fail("out_of_range");
   const found = counts(text);
-  return found.length
-    ? inRange(
-        found.reduce((a, b) => a + b, 0),
-        1,
-        10,
-      )
-    : fail("unclear");
+  if (!found.length) return fail("unclear");
+
+  // For ranges, use the upper bound instead of adding both numbers.
+  const isRange = /\d\s*-\s*\d/.test(text);
+  const total = isRange ? Math.max(...found) : found.reduce((sum, value) => sum + value, 0);
+
+  return inRange(total, 1, 10);
 }
 
-/** Amounts such as £2,500, 2.5k or 600 per week. Several figures give the highest one. */
+/** Extracts amounts such as £2,500, 2.5k or 600 per week. */
 function amounts(text: string): number[] {
   return [...text.matchAll(/(\d[\d,]*(?:\.\d+)?)\s*(k|thousand)?/gi)]
-    .map((m) => Number(m[1].replace(/,/g, "")) * (m[2] ? 1000 : 1))
+    .map((match) => Number(match[1].replace(/,/g, "")) * (match[2] ? 1000 : 1))
     .filter(Number.isFinite);
 }
 
 const WEEKLY = /\b(pw|p\/w|per week|a week|weekly|each week)\b|\/w\b/i;
 const MONTHLY = /\b(pcm|per month|a month|monthly|each month)\b|\/m\b/i;
 
-/** Monthly rent budget in GBP. Weekly figures are converted to a calendar month. */
+/** Monthly rental budget in GBP. */
 export function parseBudget(text: string): ParseResult<number> {
   if (isNegative(text)) return fail("out_of_range");
   const found = amounts(text);
@@ -199,7 +274,7 @@ export function parseBudget(text: string): ParseResult<number> {
   return inRange(monthly, 300, 50_000);
 }
 
-/** Gross annual income in GBP. Monthly and weekly figures are annualised. */
+/** Gross annual income in GBP. */
 export function parseIncome(text: string): ParseResult<number> {
   if (/\b(none|nothing|nil|zero|no income)\b/i.test(text)) return ok(0);
   if (isNegative(text)) return fail("out_of_range");
@@ -213,15 +288,14 @@ export function parseIncome(text: string): ParseResult<number> {
 /* ---------- Choices ---------- */
 export function parseYesNo(text: string): ParseResult<boolean> {
   const t = text.trim().toLowerCase();
-  if (/^(no|nope|nah|n|none|not really|i do not|i don'?t|we don'?t|we do not)\b/.test(t))
+  if (/^(no|nope|nah|n|none|not really|i do not|i don't|we don't|we do not)\b/.test(t))
     return ok(false);
   if (
     /^(yes|yeah|yep|yup|y|sure|correct|definitely|of course|i do|we do|i have|we have|i can|we can)\b/.test(
       t,
     )
-  ) {
+  )
     return ok(true);
-  }
   return fail("unclear");
 }
 
@@ -229,6 +303,13 @@ const ANIMALS =
   /\b(dogs?|puppy|puppies|cats?|kittens?|rabbits?|birds?|fish|hamsters?|guinea pigs?|pets?)\b/i;
 
 export function parsePets(text: string): ParseResult<boolean> {
+  const t = text.trim().toLowerCase();
+  if (
+    /\b(no pets?|without pets?|don't have (?:any )?pets?|do not have (?:any )?pets?|no animals?)\b/i.test(
+      t,
+    )
+  )
+    return ok(false);
   const answer = parseYesNo(text);
   if (answer.ok) return answer;
   return ANIMALS.test(text) ? ok(true) : fail("unclear");
@@ -253,7 +334,10 @@ export function parsePropertyType(text: string) {
 
 export function parseEmployment(text: string) {
   return pick(text, [
-    ["self_employed", /\b(self[- ]?employed|freelanc\w*|contractor|own business|sole trader)\b/i],
+    [
+      "self_employed",
+      /\b(self[- ]?employed|freelanc(?:e|er|ing)|contractor|own business|sole trader)\b/i,
+    ],
     ["unemployed", /\b(unemployed|not working|between jobs|out of work)\b/i],
     ["student", /\b(student|studying|university|college)\b/i],
     ["retired", /\bretired\b/i],
@@ -263,7 +347,6 @@ export function parseEmployment(text: string) {
 }
 
 /* ---------- Free text and declining ---------- */
-/** Postcode districts such as e1 or sw3 are upper case, other words start with a capital. */
 function titleArea(value: string): string {
   return value
     .split(" ")
@@ -278,19 +361,30 @@ export function parseArea(text: string): ParseResult<string> {
     .trim()
     .replace(/[.!]+$/, "")
     .replace(/\s+/g, " ");
+  if (!value || value.length > 100) return fail("unclear");
   if (POSTCODE.test(value)) return ok(value.toUpperCase());
   const letters = value.replace(/[^\p{L}]/gu, "");
-  if (value.length > 100 || letters.length < 2 || !/^[\p{L}\p{N}\s,'’&.-]+$/u.test(value)) {
-    return fail("unclear");
-  }
+
+  if (letters.length < 2 || !/^[\p{L}\p{N}\s,'’&.-]+$/u.test(value)) return fail("unclear");
+
   return ok(value === value.toLowerCase() ? titleArea(value) : value);
+}
+
+export function parseRequirements(text: string): ParseResult<string> {
+  const value = text
+    .trim()
+    .replace(/[.!]+$/, "")
+    .replace(/\s+/g, " ");
+
+  if (value.length < 2 || value.length > 300) return fail("unclear");
+
+  return ok(value);
 }
 
 const NIGHT = /\b(nights?|midnight|overnight)\b/i;
 const DAY_OR_TIME =
   /\b(mon|tues?|wed|thu(?:rs?)?|fri|sat|sun)(?:day|sday|nesday|rsday|urday)?s?\b|\b(weekdays?|weekends?|mornings?|afternoons?|evenings?|lunch(?:time)?|any ?time|any day|flexible|whenever|today|tomorrow)\b|\b\d{1,2}(?::\d{2})?\s?(?:am|pm)\b|\b\d{1,2}:\d{2}\b/i;
 
-/** Days or times that make sense for a viewing. "nights" does not. */
 export function parseViewing(text: string, now = new Date()): ParseResult<string> {
   const value = text.trim().replace(/\s+/g, " ");
   if (value.length < 2 || value.length > 300 || NIGHT.test(value)) return fail("unclear");
@@ -300,7 +394,7 @@ export function parseViewing(text: string, now = new Date()): ParseResult<string
 }
 
 export function isDecline(text: string): boolean {
-  return /\b(skip|pass|prefer not|rather not|not comfortable|don'?t want to (say|share)|no comment)\b/i.test(
+  return /\b(skip|pass|prefer not|rather not|not comfortable|don't want to (say|share)|do not want to (say|share)|no comment)\b/i.test(
     text,
   );
 }

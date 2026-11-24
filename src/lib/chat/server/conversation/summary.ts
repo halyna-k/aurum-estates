@@ -45,5 +45,5 @@ export function buildSummary(session: Session, ctx: Context, property?: Property
 
   if (property) rows.splice(FIELD_ORDER.indexOf("phone") + 1, 0, ["Property", property.address]);
 
-  return rows.map(([label, value]) => `${label}: ${value}`).join("\n");
+  return rows.map(([label, value]) => `${label}: ${value}`).join("\n\n");
 }
