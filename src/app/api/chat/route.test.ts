@@ -59,6 +59,7 @@ describe("POST /api/chat", () => {
       "yes",
       "2",
       "no pets",
+      "balcony",
       "weekday evenings",
     ];
 
@@ -79,9 +80,11 @@ describe("POST /api/chat", () => {
     expect(bye.body.message).toContain("Goodbye");
   });
 
-  it("offers a Skip reply for the phone number", async () => {
+  it("lets the phone number be skipped, with a quiet link rather than a reply button", async () => {
     const { body } = await converse(["Tom Ford", "tom@example.com"], "10.0.0.9");
-    expect(body.suggestions).toEqual(["Skip"]);
+    expect(body.canSkip).toBe(true);
+    expect(body.hint).toContain("You can skip this question");
+    expect(body.suggestions).toEqual([]);
     const skipped = await send("Skip", "10.0.0.9", { sessionToken: body.sessionToken });
     expect(skipped.body.message).toContain("What type of property");
   });

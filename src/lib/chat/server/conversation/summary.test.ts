@@ -14,7 +14,7 @@ describe("buildSummary", () => {
     const summary = buildSummary(
       sessionWith({
         answers: {
-          fullName: "Tom Ford",
+          fullName: "Tom Smith",
           email: "tom@example.com",
           phone: "+447911123456",
           propertyType: "studio",
@@ -27,14 +27,15 @@ describe("buildSummary", () => {
           hasGuarantor: false,
           occupants: 2,
           hasPets: true,
+          requirements: "balcony",
           viewingPreference: "Weekends",
         },
       }),
       ctx,
     );
 
-    expect(summary.split("\n")).toEqual([
-      "Name: Tom Ford",
+    expect(summary.split("\n\n")).toEqual([
+      "Name: Tom Smith",
       "Email: tom@example.com",
       "Phone: 07911 123456",
       "Property type: Studio",
@@ -47,6 +48,7 @@ describe("buildSummary", () => {
       "Guarantor: No",
       "People: 2",
       "Pets: Yes",
+      "Requirements: balcony",
       "Viewing: Weekends",
     ]);
   });
@@ -54,7 +56,7 @@ describe("buildSummary", () => {
   it("says when a detail was not given, so the applicant can see what is missing", () => {
     const summary = buildSummary(
       sessionWith({
-        answers: { fullName: "Tom Ford", email: "tom@example.com" },
+        answers: { fullName: "Tom Smith", email: "tom@example.com" },
         declined: ["phone", "occupants"],
       }),
       ctx,
@@ -68,14 +70,14 @@ describe("buildSummary", () => {
     const property = PROPERTIES[0];
     const summary = buildSummary(
       sessionWith({
-        answers: { fullName: "Tom Ford", email: "tom@example.com", propertyId: property.id },
+        answers: { fullName: "Tom Smith", email: "tom@example.com", propertyId: property.id },
       }),
       { ...ctx, propertyRentPcm: property.rentPcm },
       property,
     );
 
-    expect(summary.split("\n").slice(0, 4)).toEqual([
-      "Name: Tom Ford",
+    expect(summary.split("\n\n").slice(0, 4)).toEqual([
+      "Name: Tom Smith",
       "Email: tom@example.com",
       "Phone: Not given",
       `Property: ${property.address}`,
@@ -88,7 +90,7 @@ describe("buildSummary", () => {
     const summary = buildSummary(
       sessionWith({
         answers: {
-          fullName: "Tom Ford",
+          fullName: "Tom Smith",
           email: "tom@example.com",
           budget: 2000,
           annualIncome: 80000,

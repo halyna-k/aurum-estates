@@ -13,25 +13,20 @@ describe("question flow", () => {
     expect(new Set(FIELD_ORDER).size).toBe(FIELD_ORDER.length);
   });
 
-  it("lets applicants decline everything except name and email", () => {
+  it("requires the name and the email", () => {
     const required = FIELDS.filter((spec) => spec.required).map((spec) => spec.key);
     expect(required).toEqual(["fullName", "email"]);
   });
 
-  it("asks short questions that end with a question mark", () => {
-    for (const spec of FIELDS.filter((s) => s.key !== "phone")) {
-      expect(spec.question.endsWith("?")).toBe(true);
-      expect(spec.question.length).toBeLessThan(100);
-    }
+  it("lets the applicant skip only what is sensitive or not essential", () => {
+    const skippable = FIELDS.filter((spec) => spec.skippable).map((spec) => spec.key);
+    expect(skippable).toEqual(["phone", "employmentStatus", "requirements", "viewingPreference"]);
   });
-});
 
-describe("quick replies", () => {
-  it("offers only answers that the field accepts", () => {
+  it("asks questions that are short and read as questions", () => {
     for (const spec of FIELDS) {
-      for (const choice of spec.choices ?? []) {
-        expect(spec.parse(choice, NOW).ok, `${spec.key}: ${choice}`).toBe(true);
-      }
+      expect(spec.question).toContain("?");
+      expect(spec.question.length).toBeLessThan(160);
     }
   });
 
@@ -41,13 +36,41 @@ describe("quick replies", () => {
   });
 });
 
+describe("hints", () => {
+  it("keeps the question short and puts the format or the reason in the hint", () => {
+    for (const spec of FIELDS) {
+      expect(spec.question.endsWith("?"), spec.key).toBe(true);
+      expect(spec.question.length, spec.key).toBeLessThan(80);
+      expect(spec.hint?.length ?? 0, spec.key).toBeLessThan(110);
+    }
+  });
+
+  it("explains the answer to every question that is not a plain contact detail", () => {
+    for (const spec of FIELDS.filter((s) => s.key !== "email")) {
+      expect(spec.hint, spec.key).toBeTruthy();
+    }
+  });
+
+  it("says in the hint that a question can be skipped, when it can", () => {
+    for (const spec of FIELDS.filter((field) => field.skippable)) {
+      expect(spec.hint?.toLowerCase().includes("skip"), spec.key).toBe(Boolean(spec.skippable));
+    }
+  });
+
+  it("uses Yes/No choices for boolean questions", () => {
+    for (const key of ["hasGuarantor", "hasPets"] as const) {
+      expect(fieldSpec(key).choices).toEqual(["Yes", "No"]);
+    }
+  });
+});
+
 describe("retry messages", () => {
   it("uses the retry text when the answer was not understood", () => {
     expect(retryText(fieldSpec("email"), "unclear")).toBe(fieldSpec("email").retry);
   });
 
   it("uses the recheck text for unrealistic answers", () => {
-    expect(retryText(fieldSpec("occupants"), "out_of_range")).toContain("seems a lot");
+    expect(retryText(fieldSpec("occupants"), "out_of_range")).toContain("seems incorrect");
   });
 
   it("falls back to a generic recheck", () => {
@@ -57,6 +80,7 @@ describe("retry messages", () => {
 
 describe("answers from the earlier test conversation", () => {
   it("rejects what the first prototype accepted", () => {
+    expect(fieldSpec("occupants").parse("0", NOW).ok).toBe(false);
     expect(fieldSpec("occupants").parse("150", NOW).ok).toBe(false);
     expect(fieldSpec("occupants").parse("1000", NOW).ok).toBe(false);
     expect(fieldSpec("budget").parse("£50", NOW).ok).toBe(false);

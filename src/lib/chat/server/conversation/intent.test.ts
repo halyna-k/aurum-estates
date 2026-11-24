@@ -13,7 +13,7 @@ describe("looksLikeQuestion", () => {
     expect(looksLikeQuestion(text)).toBe(true);
   });
 
-  it.each(["when possible", "Tom Ford", "2", "next week", "yes"])(
+  it.each(["when possible", "Tom Smith", "2", "next week", "yes"])(
     "sees %j as an answer",
     (text) => {
       expect(looksLikeQuestion(text)).toBe(false);

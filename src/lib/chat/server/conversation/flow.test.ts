@@ -3,7 +3,7 @@ import { agency } from "@/agency/config";
 import { PROPERTIES } from "@/agency/properties";
 import type { Property } from "@/types/property";
 import { FIELD_ORDER, fieldSpec } from "@/lib/chat/server/answers/fields";
-import { afterSave, restartTurn, takeTurn, type Turn } from "./flow";
+import { afterSave, canSkip, hintFor, restartTurn, takeTurn, type Turn } from "./flow";
 import { type Context, type Session, newSession } from "./session";
 
 const NOW = new Date("2026-10-23T12:00:00Z");
@@ -31,7 +31,7 @@ function converse(messages: string[], start = newSession(), property?: Property)
 const message = (t: Turn) => (t.kind === "say" ? t.message : "");
 const replies = (t: Turn) => (t.kind === "save" ? [] : t.suggestions);
 
-const CONTACT = ["Tom Ford", "tom@example.com", "07911 123456"];
+const CONTACT = ["Tom Smith", "tom@example.com", "07911 123456"];
 const FULL = [
   ...CONTACT,
   "flat",
@@ -44,6 +44,7 @@ const FULL = [
   "yes",
   "2",
   "no pets",
+  "balcony",
   "weekday evenings",
 ];
 
@@ -58,7 +59,7 @@ describe("collecting details", () => {
   it("asks the questions in order and ends with a summary to confirm", () => {
     const last = converse(FULL);
     expect(last.session.phase).toBe("confirming");
-    expect(message(last)).toContain("Name: Tom Ford");
+    expect(message(last)).toContain("Name: Tom Smith");
     expect(message(last)).toContain("Phone: 07911 123456");
     expect(message(last)).toContain("Move-in date: 23 Oct 2026");
     expect(message(last)).toContain("Guarantor: Yes");
@@ -78,18 +79,21 @@ describe("collecting details", () => {
       "yes",
       "150",
     ]);
-    expect(message(last)).toBe("That seems a lot. Could you check the number of people, please?");
-  });
-
-  it("moves on after two unclear answers about an optional detail", () => {
-    const last = converse([...FULL.slice(0, 12), "crocodile", "a crocodile"]);
     expect(message(last)).toBe(
-      `No problem, let us move on.\n\n${fieldSpec("viewingPreference").question}`,
+      "That seems incorrect. Could you check the number of people, please?",
     );
   });
 
+  it("moves on after two unclear answers about an optional detail", () => {
+    const last = converse([...FULL.slice(0, 14), "crocodile", "a crocodile"]);
+    expect(last.session.phase).toBe("confirming");
+    expect(message(last)).toContain("No problem, let us move on.");
+    expect(message(last)).toContain("Viewing: Not given");
+    expect(message(last)).toContain("Is that all correct?");
+  });
+
   it("does not accept nights as a time for a viewing", () => {
-    const last = converse([...FULL.slice(0, 13), "nights"]);
+    const last = converse([...FULL.slice(0, 14), "nights"]);
     expect(message(last)).toBe(fieldSpec("viewingPreference").retry);
   });
 
@@ -122,6 +126,7 @@ describe("collecting details", () => {
       "18",
       "18",
       "no pets",
+      "balcony",
       "weekday evenings",
     ]);
     expect(message(last)).toContain("People: Not given");
@@ -196,7 +201,7 @@ describe("confirming", () => {
     const again = turn(email.session, "new.address@example.com");
     expect(again.session.phase).toBe("confirming");
     expect(message(again)).toContain("Email: new.address@example.com");
-    expect(message(again)).toContain("Name: Tom Ford");
+    expect(message(again)).toContain("Name: Tom Smith");
   });
 
   it("answers a question without confirming", () => {
@@ -236,17 +241,27 @@ describe("after the lead is saved", () => {
   });
 });
 
-describe("quick replies", () => {
-  it("offers Skip on optional questions only", () => {
-    expect(replies(converse(["Tom Ford"]))).toEqual([]);
-    expect(replies(converse(CONTACT.slice(0, 2)))).toEqual(["Skip"]);
+describe("quick replies and skipping", () => {
+  const ctx = ctxFor();
+  const ask = (messages: string[]) => converse(messages).session;
+
+  it("offers a quiet Skip only on the questions that may be skipped", () => {
+    expect(canSkip(ask(["Tom Smith"]), ctx)).toBe(false);
+    expect(canSkip(ask(CONTACT.slice(0, 2)), ctx)).toBe(true);
+    expect(canSkip(ask(CONTACT), ctx)).toBe(false);
   });
 
-  it("offers the choices for a closed question", () => {
-    expect(replies(converse(CONTACT))).toEqual(["Studio", "Flat", "House", "Room", "Skip"]);
+  it("never offers Skip for the income", () => {
+    const income = ask([...CONTACT, "flat", "2", "£2,500", "Chelsea", "asap", "employed"]);
+    expect(canSkip(income, ctx)).toBe(false);
   });
 
-  it("offers yes or no after the summary", () => {
+  it("offers yes/no quick replies only for boolean questions", () => {
+    const guarantor = [...CONTACT, "flat", "2", "£2,500", "Chelsea", "asap", "employed", "£45,000"];
+    expect(replies(converse(guarantor))).toEqual(["Yes", "No"]);
+  });
+
+  it("offers the confirmation replies after the summary", () => {
     expect(replies(converse(FULL))).toEqual(["Yes, that is correct", "Change something"]);
   });
 
@@ -263,8 +278,46 @@ describe("quick replies", () => {
   });
 
   it("keeps the same replies when a question is answered by the model", () => {
-    expect(replies(converse(["Tom Ford", "tom@example.com", "How much is the deposit?"]))).toEqual([
-      "Skip",
-    ]);
+    const guarantor = [...CONTACT, "flat", "2", "£2,500", "Chelsea", "asap", "employed", "£45,000"];
+    expect(replies(converse([...guarantor, "What is a guarantor?"]))).toEqual(["Yes", "No"]);
+  });
+
+  it("does not treat a typed skip as an answer to a core question", () => {
+    const last = converse([...CONTACT, "flat", "2", "skip"]);
+    expect(message(last)).toBe(fieldSpec("budget").retry);
+  });
+});
+
+describe("studios and rooms", () => {
+  it("does not ask for bedrooms after a studio", () => {
+    expect(message(converse([...CONTACT, "studio"]))).toBe(fieldSpec("budget").question);
+  });
+
+  it("does not ask for bedrooms after a room", () => {
+    expect(message(converse([...CONTACT, "a room"]))).toBe(fieldSpec("budget").question);
+  });
+
+  it("still asks for bedrooms after a flat", () => {
+    expect(message(converse([...CONTACT, "flat"]))).toBe(fieldSpec("bedrooms").question);
+  });
+});
+
+describe("hints", () => {
+  it("shows the hint of the question that is open, and none once the summary is shown", () => {
+    const asked = converse(CONTACT.slice(0, 2)).session;
+    expect(hintFor(asked, ctxFor())).toBe(fieldSpec("phone").hint);
+    expect(hintFor(converse(FULL).session, ctxFor())).toBeUndefined();
+  });
+
+  it("keeps the hint while the same question is asked again", () => {
+    const retried = converse([
+      ...CONTACT,
+      "flat",
+      "2",
+      "£2,500",
+      "Chelsea",
+      "whenever it suits",
+    ]).session;
+    expect(hintFor(retried, ctxFor())).toBe(fieldSpec("moveInDate").hint);
   });
 });

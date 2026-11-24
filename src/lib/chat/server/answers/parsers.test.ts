@@ -41,6 +41,21 @@ describe("parseMoveInDate", () => {
     expect(value(parseMoveInDate(text, NOW))).toBe(expected);
   });
 
+  it.each([
+    ["01.11.26", "2026-11-01"],
+    ["1/11/2026", "2026-11-01"],
+    ["15-11-26", "2026-11-15"],
+    ["15.11", "2026-11-15"],
+    ["1.10", "2027-10-01"],
+  ])("reads the numeric date %s, day first", (text, expected) => {
+    expect(value(parseMoveInDate(text, NOW))).toBe(expected);
+  });
+
+  it("rejects a date that does not exist, or one that has passed", () => {
+    expect(reason(parseMoveInDate("31.02.2026", NOW))).toBe("unclear");
+    expect(reason(parseMoveInDate("01.10.26", NOW))).toBe("in_the_past");
+  });
+
   it("rejects dates in the past", () => {
     expect(reason(parseMoveInDate("1 October 2026", NOW))).toBe("in_the_past");
   });

@@ -22,13 +22,13 @@ describe("nextField", () => {
   it("starts with the name and then the email", () => {
     expect(nextField(session(), ctx)).toBe("fullName");
     expect(
-      nextField(session({ answers: { fullName: "Tom Ford", email: "t@example.com" } }), ctx),
+      nextField(session({ answers: { fullName: "Tom Smith", email: "t@example.com" } }), ctx),
     ).toBe("phone");
   });
 
   it("does not ask about a declined field again", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com" },
+      answers: { fullName: "Tom Smith", email: "t@example.com" },
       declined: ["phone"],
     });
     expect(nextField(s, ctx)).toBe("propertyType");
@@ -36,7 +36,7 @@ describe("nextField", () => {
 
   it("skips the guarantor when income comfortably covers the rent", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com", budget: 2000, annualIncome: 60000 },
+      answers: { fullName: "Tom Smith", email: "t@example.com", budget: 2000, annualIncome: 60000 },
       declined: ["phone", "propertyType", "bedrooms", "area", "moveInDate", "employmentStatus"],
     });
     expect(nextField(s, ctx)).toBe("occupants");
@@ -44,7 +44,7 @@ describe("nextField", () => {
 
   it("asks about a guarantor when income is below the guide", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com", budget: 2000, annualIncome: 40000 },
+      answers: { fullName: "Tom Smith", email: "t@example.com", budget: 2000, annualIncome: 40000 },
       declined: ["phone", "propertyType", "bedrooms", "area", "moveInDate", "employmentStatus"],
     });
     expect(nextField(s, ctx)).toBe("hasGuarantor");
@@ -52,7 +52,7 @@ describe("nextField", () => {
 
   it("asks about a guarantor when the income was not given", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com", budget: 2000 },
+      answers: { fullName: "Tom Smith", email: "t@example.com", budget: 2000 },
       declined: [
         "phone",
         "propertyType",
@@ -68,7 +68,7 @@ describe("nextField", () => {
 
   it("does not repeat what a property enquiry already tells us", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com", propertyId: "brook-street-14" },
+      answers: { fullName: "Tom Smith", email: "t@example.com", propertyId: "brook-street-14" },
       declined: ["phone"],
     });
     expect(nextField(s, { ...ctx, propertyRentPcm: 6500 })).toBe("moveInDate");
@@ -76,7 +76,7 @@ describe("nextField", () => {
 
   it("finishes when every field is answered or declined", () => {
     const s = session({
-      answers: { fullName: "Tom Ford", email: "t@example.com" },
+      answers: { fullName: "Tom Smith", email: "t@example.com" },
       declined: [
         "phone",
         "propertyType",
@@ -89,6 +89,7 @@ describe("nextField", () => {
         "hasGuarantor",
         "occupants",
         "hasPets",
+        "requirements",
         "viewingPreference",
       ],
     });
@@ -101,11 +102,11 @@ describe("applyAnswer", () => {
     const { session: next, outcome } = applyAnswer(
       session(),
       "fullName",
-      "my name is tom ford",
+      "my name is tom smith",
       NOW,
     );
     expect(outcome.kind).toBe("accepted");
-    expect(next.answers.fullName).toBe("Tom Ford");
+    expect(next.answers.fullName).toBe("Tom Smith");
   });
 
   it("asks again after an unclear answer and then gives up on an optional field", () => {
@@ -125,7 +126,7 @@ describe("applyAnswer", () => {
     const { outcome } = applyAnswer(session(), "occupants", "150", NOW);
     expect(outcome).toEqual({
       kind: "retry",
-      message: "That seems a lot. Could you check the number of people, please?",
+      message: "That seems incorrect. Could you check the number of people, please?",
     });
   });
 
@@ -137,14 +138,17 @@ describe("applyAnswer", () => {
   });
 
   it("lets the applicant decline an optional question", () => {
-    const { session: next, outcome } = applyAnswer(
-      session(),
-      "annualIncome",
-      "I'd rather not say",
-      NOW,
-    );
+    const { session: next, outcome } = applyAnswer(session(), "phone", "I'd rather not say", NOW);
     expect(outcome.kind).toBe("declined");
-    expect(next.declined).toContain("annualIncome");
+    expect(next.declined).toContain("phone");
+  });
+
+  it("does not let the applicant decline a question that is not skippable", () => {
+    const { outcome } = applyAnswer(session(), "budget", "Skip", NOW);
+    expect(outcome).toEqual({
+      kind: "retry",
+      message: "Sorry, could you give your budget as an amount, for example £2,500 a month?",
+    });
   });
 
   it("does not let the applicant decline the name or the email", () => {
@@ -168,14 +172,14 @@ describe("applyAnswer", () => {
 
   it("does not change the session it was given", () => {
     const original = session();
-    applyAnswer(original, "fullName", "Tom Ford", NOW);
+    applyAnswer(original, "fullName", "Tom Smith", NOW);
     expect(original.answers).toEqual({});
   });
 });
 
 describe("sealed session", () => {
   const sample = session({
-    answers: { fullName: "Tom Ford", email: "t@example.com", propertyId: "brook-street-14" },
+    answers: { fullName: "Tom Smith", email: "t@example.com", propertyId: "brook-street-14" },
     declined: ["phone"],
     attempts: { occupants: 1 },
   });
@@ -218,12 +222,12 @@ describe("reopenField", () => {
   it("forgets one answer and goes back to collecting", () => {
     const s = session({
       phase: "confirming",
-      answers: { fullName: "Tom Ford", email: "t@example.com" },
+      answers: { fullName: "Tom Smith", email: "t@example.com" },
       declined: ["phone"],
     });
     const reopened = reopenField(s, "email");
     expect(reopened.phase).toBe("collecting");
-    expect(reopened.answers).toEqual({ fullName: "Tom Ford" });
+    expect(reopened.answers).toEqual({ fullName: "Tom Smith" });
     expect(nextField(reopened, ctx)).toBe("email");
   });
 
