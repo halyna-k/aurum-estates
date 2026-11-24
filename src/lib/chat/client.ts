@@ -26,7 +26,9 @@ function isChatReply(data: unknown): data is ChatReply {
     reply.leadData !== null &&
     typeof reply.leadSaved === "boolean" &&
     typeof reply.closed === "boolean" &&
-    Array.isArray(reply.suggestions)
+    Array.isArray(reply.suggestions) &&
+    typeof reply.canSkip === "boolean" &&
+    (reply.hint === undefined || typeof reply.hint === "string")
   );
 }
 

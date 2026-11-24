@@ -58,6 +58,9 @@ function isSettled(session: Session, key: AskedField): boolean {
 export function isSkipped(session: Session, key: AskedField, ctx: Context): boolean {
   if (ctx.propertyRentPcm !== undefined && PROPERTY_FIELDS.includes(key)) return true;
 
+  // A room in a shared house is not described by a number of bedrooms.
+  if (key === "bedrooms" && session.answers.propertyType === "room") return true;
+
   if (key === "hasGuarantor") {
     const rent = ctx.propertyRentPcm ?? session.answers.budget;
     const income = session.answers.annualIncome;
@@ -87,11 +90,13 @@ function withoutAttempts(attempts: Session["attempts"], field: AskedField): Sess
 
 /** Forgets an answer so that the field is asked again, for a correction. */
 export function reopenField(session: Session, field: AskedField): Session {
+  // Changing from a studio also forgets the bedrooms that the studio set to zero.
+  const forgotten = field === "propertyType" && session.answers.bedrooms === 0 ? ["bedrooms"] : [];
   return {
     ...session,
     phase: "collecting",
     answers: Object.fromEntries(
-      Object.entries(session.answers).filter(([key]) => key !== field),
+      Object.entries(session.answers).filter(([key]) => key !== field && !forgotten.includes(key)),
     ) as Partial<LeadAnswers>,
     declined: session.declined.filter((key) => key !== field),
     attempts: withoutAttempts(session.attempts, field),
@@ -107,7 +112,7 @@ export function applyAnswer(
   const spec = fieldSpec(field);
   const declining = isDecline(text);
 
-  if (declining && !spec.required) {
+  if (declining && spec.skippable) {
     return {
       session: {
         ...session,
@@ -121,10 +126,15 @@ export function applyAnswer(
   const result = declining ? ({ ok: false, reason: "unclear" } as const) : spec.parse(text, now);
 
   if (result.ok) {
+    // A studio has no separate bedroom, so that question is not asked.
+    const answers = withAnswer(session.answers, field, result.value);
     return {
       session: {
         ...session,
-        answers: withAnswer(session.answers, field, result.value),
+        answers:
+          field === "propertyType" && result.value === "studio"
+            ? withAnswer(answers, "bedrooms", 0)
+            : answers,
         attempts: withoutAttempts(session.attempts, field),
       },
       outcome: { kind: "accepted" },

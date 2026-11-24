@@ -3,7 +3,13 @@ import Groq from "groq-sdk";
 
 import { agency } from "@/agency/config";
 import { PROPERTIES } from "@/agency/properties";
-import { afterSave, restartTurn, takeTurn } from "@/lib/chat/server/conversation/flow";
+import {
+  afterSave,
+  canSkip,
+  hintFor,
+  restartTurn,
+  takeTurn,
+} from "@/lib/chat/server/conversation/flow";
 import { MAX_BODY_CHARS, MAX_HISTORY_MESSAGES } from "@/lib/chat/limits";
 import { aiConfig } from "@/lib/chat/server/ai/model";
 import { buildFaqPrompt } from "@/lib/chat/server/ai/prompt";
@@ -197,6 +203,8 @@ export async function POST(req: NextRequest) {
     leadSaved: session.phase === "saved",
     closed: session.phase === "closed",
     suggestions,
+    canSkip: canSkip(session, ctx),
+    hint: hintFor(session, ctx),
     agentPreview,
   };
 

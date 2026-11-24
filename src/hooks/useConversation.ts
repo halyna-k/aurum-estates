@@ -12,8 +12,11 @@ const initialState: ConversationState = {
   leadSaved: false,
   closed: false,
   suggestions: [],
+  canSkip: false,
   privacyDeclined: false,
 };
+
+type MessageMetadata = Pick<UIMessage, "hint" | "suggestions" | "canSkip">;
 
 const GENERIC_ERROR = "Sorry, something went wrong. Please try again.";
 
@@ -54,12 +57,22 @@ export function useConversation() {
     setState((prev) => ({ ...prev, propertyId }));
   }, []);
 
-  const addMessage = useCallback((role: UIMessage["role"], text: string, isError = false) => {
-    setMessages((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), role, text, timestamp: new Date(), isError },
-    ]);
-  }, []);
+  const addMessage = useCallback(
+    (role: UIMessage["role"], text: string, isError = false, metadata?: MessageMetadata) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          role,
+          text,
+          timestamp: new Date(),
+          isError,
+          ...metadata,
+        },
+      ]);
+    },
+    [],
+  );
 
   const acknowledgePrivacyNotice = useCallback(() => {
     setState((prev) => ({
@@ -68,8 +81,8 @@ export function useConversation() {
       privacyDeclined: false,
     }));
 
-    setMessages([createGreeting()]);
-  }, []);
+    setMessages([createGreeting(state.propertyId)]);
+  }, [state.propertyId]);
 
   const declinePrivacyNotice = useCallback(() => {
     const { phone, email, hours } = agency.chat.humanContact;
@@ -120,9 +133,16 @@ export function useConversation() {
           leadSaved: prev.leadSaved || reply.leadSaved,
           closed: reply.closed,
           suggestions: reply.suggestions,
+          canSkip: reply.canSkip,
+          hint: reply.hint,
           agentPreview: reply.agentPreview ?? prev.agentPreview,
         }));
-        addMessage("assistant", reply.message);
+
+        addMessage("assistant", reply.message, false, {
+          hint: reply.hint,
+          suggestions: reply.suggestions,
+          canSkip: reply.canSkip,
+        });
       } catch (error) {
         if (controller.signal.aborted) return;
         addMessage("assistant", error instanceof Error ? error.message : GENERIC_ERROR, true);
@@ -132,6 +152,12 @@ export function useConversation() {
     },
     [state, loading, messages, sessionId, addMessage],
   );
+
+  const skip = useCallback(() => {
+    if (!state.canSkip || loading || state.closed) return;
+
+    void send("Skip");
+  }, [state.canSkip, state.closed, loading, send]);
 
   const reset = useCallback(() => {
     controllerRef.current?.abort();
@@ -158,6 +184,7 @@ export function useConversation() {
     loading,
     setProperty,
     send,
+    skip,
     acknowledgePrivacyNotice,
     declinePrivacyNotice,
     reset,

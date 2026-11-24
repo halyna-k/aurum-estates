@@ -12,6 +12,15 @@ export interface UIMessage {
   text: string;
   timestamp: Date;
   isError?: boolean;
+
+  /** Contextual guidance for this message. */
+  hint?: string;
+
+  /** Optional clickable answer choices. */
+  suggestions?: string[];
+
+  /** Whether this question can be skipped. */
+  canSkip?: boolean;
 }
 
 export interface ChatMessage {
@@ -38,6 +47,9 @@ export interface ConversationState {
   closed: boolean;
   /** Quick replies for the current question. */
   suggestions: string[];
+  canSkip: boolean;
+  /** A note about the current question, shown above the input. */
+  hint?: string;
   agentPreview?: AgentPreviewData;
 }
 
@@ -61,5 +73,8 @@ export interface ChatReply {
   closed: boolean;
   /** Quick replies for the next question. */
   suggestions: string[];
+  /** The next question may be skipped. */
+  canSkip: boolean;
+  hint?: string;
   agentPreview?: AgentPreviewData;
 }
