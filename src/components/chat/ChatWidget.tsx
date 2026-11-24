@@ -3,7 +3,7 @@
 import { useId } from "react";
 import { useChat } from "@/hooks/useChat";
 import ChatLauncher from "./ChatLauncher";
-import ChatPanel from "./ChatPanel";
+import ChatPanel from "./panel/ChatPanel";
 import { agency } from "@/agency/config";
 import AgentPreview from "@/components/agent/AgentPreview";
 
@@ -22,6 +22,7 @@ export default function ChatWidget() {
           loading={chat.loading}
           inputRef={chat.inputRef}
           onSend={chat.send}
+          onSkip={chat.skip}
           onAcknowledge={chat.acknowledgePrivacyNotice}
           onDecline={chat.declinePrivacyNotice}
           onReset={chat.reset}

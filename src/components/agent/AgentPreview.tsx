@@ -32,6 +32,7 @@ export default function AgentPreview({ preview, lead }: AgentPreviewProps) {
     ["Guarantor", yesNo(lead.hasGuarantor)],
     ["Occupants", lead.occupants?.toString()],
     ["Pets", yesNo(lead.hasPets)],
+    ["Requirements", lead.requirements],
     ["Viewing", lead.viewingPreference],
   ];
 
