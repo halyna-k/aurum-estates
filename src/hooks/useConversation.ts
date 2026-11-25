@@ -153,12 +153,6 @@ export function useConversation() {
     [state, loading, messages, sessionId, addMessage],
   );
 
-  const skip = useCallback(() => {
-    if (!state.canSkip || loading || state.closed) return;
-
-    void send("Skip");
-  }, [state.canSkip, state.closed, loading, send]);
-
   const reset = useCallback(() => {
     controllerRef.current?.abort();
     controllerRef.current = null;
@@ -184,7 +178,6 @@ export function useConversation() {
     loading,
     setProperty,
     send,
-    skip,
     acknowledgePrivacyNotice,
     declinePrivacyNotice,
     reset,
