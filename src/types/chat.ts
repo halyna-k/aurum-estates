@@ -12,6 +12,15 @@ export interface UIMessage {
   text: string;
   timestamp: Date;
   isError?: boolean;
+
+  /** Contextual guidance for this message. */
+  hint?: string;
+
+  /** Optional clickable answer choices. */
+  suggestions?: string[];
+
+  /** Whether this question can be skipped. */
+  canSkip?: boolean;
 }
 
 export interface ChatMessage {
@@ -29,23 +38,43 @@ export interface AgentPreviewData {
 export interface ConversationState {
   privacyAcknowledgedAt?: IsoDateTime;
   privacyDeclined: boolean;
+  /** The property the applicant asked about, if any. */
+  propertyId?: string;
+  /** Signed by the server. The browser only passes it back. */
+  sessionToken?: string;
   leadData: Partial<LeadAnswers>;
-  declinedFields: LeadField[];
   leadSaved: boolean;
+  closed: boolean;
+  /** Quick replies for the current question. */
+  suggestions: string[];
+  canSkip: boolean;
+  /** A note about the current question, shown above the input. */
+  hint?: string;
   agentPreview?: AgentPreviewData;
 }
 
 export interface ChatRequest {
-  messages: ChatMessage[];
-  leadData: Partial<LeadAnswers>;
-  declinedFields: LeadField[];
-  leadSaved: boolean;
+  message: string;
+  /** Earlier messages, only used as context when the assistant answers a question. */
+  history: ChatMessage[];
+  sessionToken?: string;
   sessionId: string;
   privacyAcknowledgedAt: IsoDateTime;
+  propertyId?: string;
 }
 
-/** The server's merged view of the lead. The client replaces its own copy with it. */
-export type ChatReply = Pick<ChatRequest, "leadData" | "declinedFields" | "leadSaved"> & {
+export interface ChatReply {
   message: string;
+  sessionToken: string;
+  /** What the server has recorded so far. */
+  leadData: Partial<LeadAnswers>;
+  leadSaved: boolean;
+  /** The conversation has ended and the window can close. */
+  closed: boolean;
+  /** Quick replies for the next question. */
+  suggestions: string[];
+  /** The next question may be skipped. */
+  canSkip: boolean;
+  hint?: string;
   agentPreview?: AgentPreviewData;
-};
+}

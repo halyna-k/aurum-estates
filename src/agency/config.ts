@@ -51,17 +51,16 @@ export const agency: AgencyConfig = {
     privacyContactEmail: "privacy@aurum-demo.com",
     retentionMonths: 1,
   },
-
   chat: {
     assistantName,
     greeting: `Hello, I'm ${assistantName}, an AI assistant for Aurum Estates. I can answer general questions about renting and take your details for an agent to follow up. You can speak to a person at any time.`,
+    opening: "To begin, may I take your full name, please?",
     humanContact: {
       phone: "020 7946 0123",
       email: "lettings@aurum-demo.com",
       hours: "Monday to Friday, 9am to 5:30pm",
     },
   },
-
   triage: { incomeToAnnualRent: 2.5 },
   viewings: { durationMinutes: 30 },
   leads: {} as AgencyConfig["leads"],

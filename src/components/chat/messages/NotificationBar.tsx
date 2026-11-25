@@ -8,7 +8,8 @@ interface NotificationBarProps {
 export default function NotificationBar({ tone = "info", children }: NotificationBarProps) {
   return (
     <div
-      className={`mx-4 mb-2 flex shrink-0 items-start gap-2 rounded-xl px-4 py-3 text-sm text-ink ${
+      role="status"
+      className={`flex items-start gap-2 rounded-xl px-4 py-3 text-sm text-ink ${
         tone === "success" ? "bg-success/10" : "bg-surface-2"
       }`}
     >
