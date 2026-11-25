@@ -22,7 +22,6 @@ export default function ChatWidget() {
           loading={chat.loading}
           inputRef={chat.inputRef}
           onSend={chat.send}
-          onSkip={chat.skip}
           onAcknowledge={chat.acknowledgePrivacyNotice}
           onDecline={chat.declinePrivacyNotice}
           onReset={chat.reset}

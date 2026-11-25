@@ -17,7 +17,7 @@ function bubbleClass(message: UIMessage): string {
 }
 
 /** Matches "Label: *value*", and the value is shown in bold. */
-const LABELLED_VALUE = /^(.+?):\s*(.+)$/;
+const LABELLED_VALUE = /^([A-Z][^:.\n]{0,25}):\s*(.+)$/;
 
 function Line({ text, bold }: { text: string; bold: boolean }) {
   const match = bold ? LABELLED_VALUE.exec(text) : null;
